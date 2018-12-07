@@ -12,7 +12,7 @@ Simple backend for storing key/value pairs via http requests. Implemented with N
 Response:
 ```JSON
 {
-    "error": true/false
+    "error": false
 }
 ```
 
@@ -32,7 +32,7 @@ Response:
 Response:
 ```JSON
 {
-    "error": true/false
+    "error": false
 }
 ```
 
@@ -58,8 +58,8 @@ Response:
 ```JSON
 {
     "error": [
-        true/false,
-        true/false
+        false,
+        false
     ]
 }
 ```
