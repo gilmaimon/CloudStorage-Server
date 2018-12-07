@@ -11,56 +11,18 @@ app.use(bodyParser.json());
 app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))
 
-//validate mandatory parameters
-app.use('/data', function(req, res, next) {
-    var action = req.body.action;
-    if(action == null) {
-        res.status(400);
-        res.send('400: Bad Request. Missing mandatory action parameter');
-    } else if(action == 'GetObject') {
-        if(req.body.key != null) {
-            next();
-        } else {
-            res.status(400);
-            res.send('400: Bad Request. Missing mandatory parameters for action: ' + action);
-        }
-    } else if(action == 'SetObject') {
-        if(req.body.key != null && req.body.key != null) {
-            next();
-        } else {
-            res.status(400);
-            res.send('400: Bad Request. Missing mandatory parameters for action: ' + action);
-        }
-    }
-})
-
 /* Data Routes */
 app.get('/data', function (req, res) {
-    if(req.body.action == 'GetObject') {
-        const key = req.body.key;
-
-        req.userObj.get(key, function(err, result) {
-            if(err) {
-                res.status(400);
-                res.send("Error");
-            } else {
-                res.send({result});
-            }
-        })
-    }
+    req.userObj.get(req.body, function(err, result) {
+        //result.error = err;
+        res.send(result);
+    })
 })
 
 app.post('/data', function (req, res) {
-    if(req.body.action == 'SetObject') {
-        const key = req.body.key;
-        const value = req.body.value;
-        
-        req.userObj.update(key, value, function(err) {
-            res.send({"error": err});
-        })
-    } else {
-        res.send({"error": true});
-    }
+    req.userObj.update(req.body, function(err) {
+        res.send({"error": err});
+    })
 })
 
 // Route for Registering new users

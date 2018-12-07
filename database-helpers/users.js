@@ -1,6 +1,12 @@
 const crypto = require('crypto');
 const TOKEN_LENGTH = 32
 
+const SetRequestFactory = require('./set_requests');
+var setRequestFactory = new SetRequestFactory()
+
+const GetRequestFactory = require('./get_requests');
+var getRequestFactory = new GetRequestFactory()
+
 function generateToken(callback) {
     crypto.randomBytes(TOKEN_LENGTH, function(err, buffer) {
         const token = buffer.toString('hex');
@@ -8,28 +14,27 @@ function generateToken(callback) {
     })
 }
 
+
 class User {
     constructor(db, username) {
         this.db = db;
         this.username = username
     }
 
-    get(key, callback) {
-        var projection = {}
-        projection[key] = 1;
-
-       this.db.collection('users').find({'username': this.username}).project(projection).toArray(function(err, result) {
-           callback(Boolean(err), err == null? result[0][key] : null);
-       });
+    get(requestJson, callback) {
+        var request = getRequestFactory.getRequest(this.db, requestJson);
+        if(request.isValid() == false) callback(false, {})
+        else {
+            request.execute(this.username, callback);
+        }
     }
 
-    update(key, value, callback) {       
-        var update = {}
-        update[key] = value
-
-        this.db.collection('users').updateOne({'username': this.username}, {$set: update}, function(err, doc) {
-            callback(Boolean(err));
-        });
+    update(requestJson, callback) {        
+        var request = setRequestFactory.getRequest(this.db, requestJson);
+        if(request.isValid() == false) callback(false);
+        else {
+            request.execute(this.username, callback);
+        }
     }
 }
 
@@ -53,7 +58,8 @@ module.exports = class Users {
     
     register(username, password, callback) {
         this.db.collection("users").insertOne({"username":username, "password":password}, function(err, otherthing) {
-            //console.log(otherthing);
+            console.log(err);
+            console.log(otherthing);
             callback(Boolean(err));
         });
     }
