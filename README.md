@@ -2,7 +2,7 @@
 Simple backend for storing key/value pairs via http requests. Implemented with Node.js and MongoDB. Made for IOT projects.
 
 ## User Operations
-#### Register (POST)
+#### Register (POST '/user/register')
 ```JSON
 {
 	"username":"gidi",
@@ -16,8 +16,8 @@ Response:
 }
 ```
 
-## Set/Update Operations
-#### Set/Update Single Key (POST)
+## Set/Update Operations 
+#### Set/Update Single Key (POST '/data/object')
 ```JSON
 {
 	"username":"gidi",
@@ -36,7 +36,7 @@ Response:
 }
 ```
 
-#### Set/Update Multiple Keys (POST)
+#### Set/Update Multiple Keys (POST '/data/object')
 ```JSON
 {
 	"username":"gidi",
@@ -65,7 +65,7 @@ Response:
 ```
 
 ## Get Operations
-#### Get Single Key (GET)
+#### Get Single Key (GET '/data/object')
 ```JSON
 {
 	"username":"gidi",
@@ -87,7 +87,7 @@ Response:
 }
 ```
 
-#### Get Multiple Keys (GET)
+#### Get Multiple Keys (GET '/data/object')
 ```JSON
 {
 	"username":"gidi",

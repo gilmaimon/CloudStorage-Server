@@ -12,14 +12,14 @@ app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))
 
 /* Data Routes */
-app.get('/data', function (req, res) {
+app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
         //result.error = err;
         res.send(result);
     })
 })
 
-app.post('/data', function (req, res) {
+app.post('/data/object', function (req, res) {
     req.userObj.update(req.body, function(err) {
         res.send({"error": err});
     })

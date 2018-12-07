@@ -12,12 +12,7 @@ function initDb(db) {
                     $exists: true
                 }
     }]}}, function(err, collection) {
-        console.log(err)
-        if(err) {
-            console.log("Already exists")
-        } else {
-            console.log("created collection users");
-        }
+        console.log("Database Ready");
     });
     db.collection('users').createIndex( {'username': 1}, { unique: true } );
 }
