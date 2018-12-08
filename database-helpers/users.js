@@ -7,6 +7,9 @@ var setRequestFactory = new SetRequestFactory()
 const GetRequestFactory = require('./get_requests');
 var getRequestFactory = new GetRequestFactory()
 
+const CollectionAddRequest = require('./collections').CollectionAddRequest;
+const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
+
 function generateToken(callback) {
     crypto.randomBytes(TOKEN_LENGTH, function(err, buffer) {
         const token = buffer.toString('hex');
@@ -29,12 +32,32 @@ class User {
         }
     }
 
-    update(requestJson, callback) {        
+    put(requestJson, callback) {        
         var request = setRequestFactory.getRequest(this.db, requestJson);
         if(request.isValid() == false) callback(false);
         else {
             request.execute(this.username, callback);
         }
+    }
+     
+    add(requestJson, callback) {
+        var request = new CollectionAddRequest(this.db, requestJson);
+        if(request.isValid() == false) {
+            callback(false);
+            return;
+        }
+
+        request.execute(this.username, callback);
+    }
+
+    filter(requestJson, callback) {
+        var request = new CollectionFetchRequest(this.db, requestJson);
+        if(request.isValid() == false) {
+            callback(false);
+            return;
+        }
+
+        request.execute(this.username, callback);
     }
 }
 

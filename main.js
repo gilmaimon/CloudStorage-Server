@@ -6,22 +6,43 @@ const UserLoginValidator = require('./middleware/login-validator')
 
 var app = express()
 
-/* Middleware */
+/**** Middleware ****/
 app.use(bodyParser.json());
 app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))
 
-/* Data Routes */
+/**** Data Routes ****/
+
+/* Single Object Operations*/
 app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
-        //result.error = err;
         res.send(result);
     })
 })
 
 app.post('/data/object', function (req, res) {
-    req.userObj.update(req.body, function(err) {
+    req.userObj.put(req.body, function(err) {
         res.send({"error": err});
+    })
+})
+
+/* Collections Operations*/
+app.post('/data/collection', function (req, res) {
+   req.userObj.add(req.body, function(err) {
+       res.send({"error": err});
+   })
+})
+
+app.get('/data/collection', function(req, res) {
+    req.userObj.filter(req.body, function(err, result) {
+        if(err) {
+            res.send({"error": true});
+        } else {
+            var parsedResult = {}
+            parsedResult.error = false;
+            parsedResult['result'] = result;
+            res.send(parsedResult);
+        }
     })
 })
 
