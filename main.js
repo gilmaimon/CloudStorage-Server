@@ -35,6 +35,7 @@ app.post('/', function(req, res) {
 /* Single Object Operations*/
 app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
+        console.log(result);
         res.send(result);
     })
 })
