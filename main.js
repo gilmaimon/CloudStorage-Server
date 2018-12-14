@@ -6,10 +6,29 @@ const UserLoginValidator = require('./middleware/login-validator')
 
 var app = express()
 
-/**** Middleware ****/
 app.use(bodyParser.json());
+
+/**** Middleware ****/
+app.use(function(req, res, next) {
+    console.log("New Client (" + req.ip + "), " + 
+        req.protocol + " " + req.method + 
+        " request for: " + req.originalUrl); 
+    console.log(JSON.stringify(req.body))   
+    next();
+});
+
 app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))
+
+
+/** Test Route **/
+app.get('/', function(req, res) {
+    res.end(JSON.stringify(req.body));
+});
+app.post('/', function(req, res) {
+    res.end(JSON.stringify(req.body));
+});
+
 
 /**** Data Routes ****/
 
