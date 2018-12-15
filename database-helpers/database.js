@@ -23,11 +23,11 @@ const dbClient = require('mongodb').MongoClient;
 module.exports = {
     initDatabaseConnection: function initDatabaseConnection(fullUrl, callback) {
         dbClient.connect(fullUrl, {useNewUrlParser:true}, function(err, db) {
-            if (err) throw err;
+            if (err) callback(true, null);
             else {
                 db = db.db("cloudstorage");
                 initDb(db);
-                callback(db);
+                callback(false, db);
             }
         })
     }

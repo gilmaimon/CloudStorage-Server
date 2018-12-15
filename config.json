@@ -1,0 +1,7 @@
+{
+    "port" :8080,
+    "mongodb_url": "mongodb://localhost:27017",
+    "verbose" : true,
+    "allow_registering" : true,
+    "test_routes" : true
+}
