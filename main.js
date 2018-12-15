@@ -37,12 +37,14 @@ if(config.test_routes) {
 // Single Object Operations
 app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
-        console.log(result);
+        res.status(err? 400: 200);
+        result["error"] = err;
         res.send(result);
     });
 });
 app.post('/data/object', function (req, res) {
     req.userObj.put(req.body, function(err) {
+        res.status(err? 400: 200);
         res.send({"error": err});
     });
 });
@@ -50,13 +52,14 @@ app.post('/data/object', function (req, res) {
 // Collections Operations
 app.post('/data/collection', function (req, res) {
    req.userObj.add(req.body, function(err) {
-       res.send({"error": err});
+    res.status(err? 400: 200);   
+    res.send({"error": err});
    });
 });
 app.get('/data/collection', function(req, res) {
     req.userObj.filter(req.body, function(err, result) {
         if(err) {
-            res.send({"error": true});
+            res.status(400).send({"error": true});
         } else {
             var parsedResult = {};
             parsedResult.error = false;
@@ -89,4 +92,4 @@ db.initDatabaseConnection(config.mongodb_url, function(err, db) {
     } else {
         console.log("Database init error");
     }
-})
+});

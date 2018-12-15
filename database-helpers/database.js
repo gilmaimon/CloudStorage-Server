@@ -19,7 +19,6 @@ function initDb(db) {
 
 const dbClient = require('mongodb').MongoClient;
 
-//"mongodb://localhost:27017"
 module.exports = {
     initDatabaseConnection: function initDatabaseConnection(fullUrl, callback) {
         dbClient.connect(fullUrl, {useNewUrlParser:true}, function(err, db) {
