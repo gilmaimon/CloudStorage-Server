@@ -30,6 +30,14 @@ class CollectionAddRequest {
     }
 }
 
+function getNumberOrDefault(jsonObj, key, defaultValue) {
+    if(jsonObj.hasOwnProperty(key) && !isNaN(jsonObj[key])) {
+        return jsonObj[key];
+    } else {
+        return defaultValue;
+    }
+}
+
 class CollectionFetchRequest {
     constructor(db, requestJson) {
         this.db = db;
@@ -40,11 +48,11 @@ class CollectionFetchRequest {
     // is valid or not (result means isValid)
     __parse(requestJson) {
         if (requestJson.hasOwnProperty('collection_key')) {
-            if(requestJson.hasOwnProperty('size') && isNaN(requestJson['size'])) {
-                return false;
-            }
             this.request = {}
+            this.request.limit = getNumberOrDefault(requestJson, 'limit', 20);
+            this.request.skip = getNumberOrDefault(requestJson, 'skip', 0);
             this.request.collection_key = requestJson['collection_key'];
+            console.log(this.request);
             return true;
         } else return false;
     }
@@ -55,11 +63,18 @@ class CollectionFetchRequest {
 
     execute(username, callback) {
         if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
-        var projection = {}
-        projection['data.' + this.request.collection_key] = 1;
-
-        this.db.collection('users').find({"username": username, }).project(projection).toArray(function(err, result) {
-            callback(Boolean(err), result[0]['data']);
+                
+        console.log(username);
+        this.db.collection('users').aggregate([
+            { $match : { "username" : username }},
+            { $project: { ["data." + this.request.collection_key] : 1 }},
+            { $unwind: { path: "$data." + this.request.collection_key }},
+            { $skip : this.request.skip },
+            { $limit: this.request.limit },
+            { $group: { _id: "$_id", [this.request.collection_key]: { $push: "$data." + this.request.collection_key } } },
+            { $project: { _id: false } }
+        ]).toArray(function(err, result) {
+            callback(Boolean(err), result[0]);//;[0]['data']);
         });
     }
 }
