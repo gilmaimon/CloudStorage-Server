@@ -51,6 +51,7 @@ class CollectionFetchRequest {
             this.request = {}
             this.request.limit = getNumberOrDefault(requestJson, 'limit', 20);
             this.request.skip = getNumberOrDefault(requestJson, 'skip', 0);
+            this.request.from_last = requestJson.from_last? Boolean(requestJson.from_last) : false;
             this.request.collection_key = requestJson['collection_key'];
             console.log(this.request);
             return true;
@@ -63,18 +64,32 @@ class CollectionFetchRequest {
 
     execute(username, callback) {
         if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
-                
+
+        var projectBlock = null;
+        if(this.request.from_last) {
+            projectBlock = { $project: { 
+                [this.request.collection_key] : { $slice: [
+                    "$data." + this.request.collection_key,
+                    this.request.limit * -1
+                ]}
+            }}
+        } else {
+            projectBlock = { $project: { 
+                [this.request.collection_key] : { $slice: [
+                    "$data." + this.request.collection_key,
+                    this.request.skip, 
+                    this.request.limit
+                ]}
+            }}
+        }
+
         console.log(username);
         this.db.collection('users').aggregate([
             { $match : { "username" : username }},
-            { $project: { ["data." + this.request.collection_key] : 1 }},
-            { $unwind: { path: "$data." + this.request.collection_key }},
-            { $skip : this.request.skip },
-            { $limit: this.request.limit },
-            { $group: { _id: "$_id", [this.request.collection_key]: { $push: "$data." + this.request.collection_key } } },
-            { $project: { _id: false } }
+            projectBlock,
+            { $project : { _id: false } }
         ]).toArray(function(err, result) {
-            callback(Boolean(err), result[0]);//;[0]['data']);
+            callback(Boolean(err), result[0]);
         });
     }
 }
