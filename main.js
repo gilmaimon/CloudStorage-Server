@@ -54,8 +54,8 @@ const speedLimiter = slowDown({
     keyGenerator: usernameOrIpKeyGenerator
 });
 
-app.use('/data', limiter);
-app.use('/data', speedLimiter);
+app.use('/', limiter);
+app.use('/', speedLimiter);
 if(config.verbose) app.use(RequestLogger());
 app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))

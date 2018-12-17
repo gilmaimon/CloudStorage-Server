@@ -4,10 +4,9 @@
     "verbose" : true,
     "allow_registering" : true,
     "test_routes" : true,
-    "requests_limiter_window_minutes": 1,
-    "requests_limiter_max_requests": 10,
-    "slowdown_window_minutes": 1,
-    "slowdown_max_requests": 5,
-    "slowdown_delay_ms": 250
-
+    "requests_limiter_window_minutes": 15,
+    "requests_limiter_max_requests": 200,
+    "slowdown_window_minutes": 15,
+    "slowdown_max_requests": 175,
+    "slowdown_delay_ms": 50
 }
