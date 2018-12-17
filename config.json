@@ -3,5 +3,11 @@
     "mongodb_url": "mongodb://localhost:27017",
     "verbose" : true,
     "allow_registering" : true,
-    "test_routes" : true
+    "test_routes" : true,
+    "requests_limiter_window_minutes": 1,
+    "requests_limiter_max_requests": 10,
+    "slowdown_window_minutes": 1,
+    "slowdown_max_requests": 5,
+    "slowdown_delay_ms": 250
+
 }

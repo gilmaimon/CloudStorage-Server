@@ -16,10 +16,46 @@ config.verbose = config.verbose || false;
 config.allow_registering = config.allow_registering || false;
 config.test_routes = config.test_routes || false; 
 
+config.requests_limiter_window_minutes = config.requests_limiter_window_minutes || 15 * 60 * 1000;
+config.requests_limiter_max_requests = config.requests_limiter_max_requests || 500;
+
+config.slowdown_window_minutes = config.slowdown_window_minutes || 15 * 60 * 1000;
+config.slowdown_max_requests = config.slowdown_max_requests || 500;
+config.slowdown_delay_ms = config.slowdown_delay_ms || 500;
+
 var app = express()
+
+// returns as key (for limiting and slowing down requests) returns the username or the ip (if no username is provided)
+usernameOrIpKeyGenerator = function(req) {
+    if (req.body['username'] != null) return req.body.username;
+    else return req.ip;
+};
 
 // Setup Middlwares
 app.use(bodyParser.json());
+
+// requests throttler and limiter
+const rateLimit = require("express-rate-limit");
+const limiter = rateLimit({
+    windowMs: config.requests_limiter_window_minutes * 60 * 1000,
+    max: config.requests_limiter_max_requests,
+    handler: function(req, res) {
+        res.status(429).send({error: true, message: "Too Many Requests. Wait and try again."});
+    },
+    keyGenerator: usernameOrIpKeyGenerator
+});
+
+// requests slowdown
+const slowDown = require('express-slow-down');
+const speedLimiter = slowDown({
+    windowMs: config.slowdown_window_minutes * 60 * 1000, 
+    delayAfter: config.slowdown_max_requests,
+    delayMs: config.slowdown_delay_ms,
+    keyGenerator: usernameOrIpKeyGenerator
+});
+
+app.use('/data', limiter);
+app.use('/data', speedLimiter);
 if(config.verbose) app.use(RequestLogger());
 app.use('/data', JsonKeyValidator(['username', 'password']));
 app.use('/data', UserLoginValidator(app.locals.users))
