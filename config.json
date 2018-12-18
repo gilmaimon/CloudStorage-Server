@@ -1,5 +1,5 @@
 {
-    "port" :8080,
+    "port" :80,
     "mongodb_url": "mongodb://localhost:27017",
     "verbose" : false,
     "allow_registering" : true,
