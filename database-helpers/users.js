@@ -69,8 +69,27 @@ module.exports = class Users {
     }
     
     register(username, password, callback) {
+        if(username == null || password == null) {
+            callback(true, "missing parameters (username/password)");
+            return;
+        }
+
+        username = username.trim();
+        password = password.trim();
+
+        var errorMsg = function(username, password) {
+            if(username.length < 4 || username.length > 16) return "Error: username longer than 16 or shorter than 4 characters";
+            if(password.length < 8 || password.length > 36) return "Error: password longer than 36 or shorter than 8 characters";
+            return null;
+        } (username, password);
+
+        if(errorMsg != null) {
+            callback(true, errorMsg);
+            return;
+        }
+
         this.db.collection("users").insertOne({"username":username, "password":password}, function(err, otherthing) {
-            callback(Boolean(err));
+            callback(Boolean(err), Boolean(err)? "Error: Username might be taken.": "OK");
         });
     }
 };

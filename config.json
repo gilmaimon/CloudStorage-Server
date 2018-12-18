@@ -1,11 +1,15 @@
 {
     "port" :8080,
     "mongodb_url": "mongodb://localhost:27017",
-    "verbose" : true,
+    "verbose" : false,
     "allow_registering" : true,
     "test_routes" : true,
+
+    "show_register_ui" : true,
+    
     "requests_limiter_window_minutes": 15,
     "requests_limiter_max_requests": 200,
+
     "slowdown_window_minutes": 15,
     "slowdown_max_requests": 175,
     "slowdown_delay_ms": 50

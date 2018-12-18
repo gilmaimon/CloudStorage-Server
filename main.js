@@ -15,6 +15,7 @@ config.port = config.port || 8080;
 config.verbose = config.verbose || false;
 config.allow_registering = config.allow_registering || false;
 config.test_routes = config.test_routes || false; 
+config.show_register_ui = config.show_register_ui || false;
 
 config.requests_limiter_window_minutes = config.requests_limiter_window_minutes || 15 * 60 * 1000;
 config.requests_limiter_max_requests = config.requests_limiter_max_requests || 500;
@@ -33,6 +34,7 @@ usernameOrIpKeyGenerator = function(req) {
 
 // Setup Middlwares
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // requests throttler and limiter
 const rateLimit = require("express-rate-limit");
@@ -110,13 +112,22 @@ app.post('/user/register', function (req, res) {
     if(config.allow_registering) {   
         var username = req.body.username
         var password = req.body.password
-        app.locals.users.register(username, password, function(error) {
-            res.send({"error" : error})
+
+        app.locals.users.register(username, password, function(error, msg) {
+            res.send({"error" : error, "message": msg, user: {username: username, password: password}})
         });
     } else {
         res.status(400).send("400 - Registering not allowed");
     }
-})
+});
+
+if(config.show_register_ui) {
+    app.get('/user/register', function(req, res) {
+        res.sendFile(
+            require('path').join(__dirname + '/ui/register/register.html')
+        );
+    });
+}
 
 // Connect to databae and run server
 var db = require('./database-helpers/database');
