@@ -94,8 +94,22 @@ app.post('/data/collection', function (req, res) {
     res.send({"error": err});
    });
 });
+
 app.get('/data/collection', function(req, res) {
     req.userObj.filter(req.body, function(err, result) {
+        if(err) {
+            res.status(400).send({"error": true});
+        } else {
+            var parsedResult = {};
+            parsedResult.error = false;
+            parsedResult['result'] = result;
+            res.send(parsedResult);
+        }
+    });
+});
+
+app.get('/data/collection/pop', function(req, res) {
+    req.userObj.pop(req.body, function(err, result) {
         if(err) {
             res.status(400).send({"error": true});
         } else {

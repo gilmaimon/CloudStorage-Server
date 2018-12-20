@@ -6,6 +6,7 @@ var getRequestFactory = new GetRequestFactory()
 
 const CollectionAddRequest = require('./collections').CollectionAddRequest;
 const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
+const CollectionPopRequest = require('./collections').CollectionPopRequest;
 
 class User {
     constructor(db, username) {
@@ -43,6 +44,16 @@ class User {
         var request = new CollectionFetchRequest(this.db, requestJson);
         if(request.isValid() == false) {
             callback(true);
+            return;
+        }
+
+        request.execute(this.username, callback);
+    }
+
+    pop(requestJson, callback) {
+        var request = new CollectionPopRequest(this.db, requestJson);
+        if(request.isValid() == false) {
+            callback(false, null);
             return;
         }
 

@@ -53,7 +53,6 @@ class CollectionFetchRequest {
             this.request.skip = getNumberOrDefault(requestJson, 'skip', 0);
             this.request.from_last = requestJson.from_last? Boolean(requestJson.from_last) : false;
             this.request.collection_key = requestJson['collection_key'];
-            console.log(this.request);
             return true;
         } else return false;
     }
@@ -83,7 +82,6 @@ class CollectionFetchRequest {
             }}
         }
 
-        console.log(username);
         this.db.collection('users').aggregate([
             { $match : { "username" : username }},
             projectBlock,
@@ -94,7 +92,76 @@ class CollectionFetchRequest {
     }
 }
 
+class CollectionPopRequest {
+    constructor(db, requestJson) {
+        this.db = db;
+        this.__isValid = this.__parse(requestJson);
+    }
+
+    // Returns boolean value indicating if the request 
+    // is valid or not (result means isValid)
+    __parse(requestJson) {
+        if (requestJson.hasOwnProperty('collection_key') && requestJson.hasOwnProperty('position') &&
+            ["first", "last"].includes(requestJson.position) ) {
+            this.request = {}
+            this.request.position = requestJson['position'];
+            this.request.collection_key = requestJson['collection_key'];
+            return true;
+        } else return false;
+    }
+
+    isValid() {
+        return this.__isValid;
+    }
+
+    __popItem(username, collection_key, popFirstElement, value, willBeEmpty, callback) {
+        this.db.collection('users').updateOne({username: username}, {$pop: { ["data." + collection_key] : popFirstElement? -1: 1}}, function(err) {
+            callback(Boolean(err), {value: value, empty: willBeEmpty});
+        });
+    }
+
+    __getTop(username, collection_key, popFirstElement,  callback) {
+        this.db.collection('users').aggregate([
+            { $match: { username: username } },
+            { $project: {
+                topElements: { $slice: [ "$data." + collection_key, popFirstElement? 0 : -2, 2] },
+            }},
+        ]).toArray(function(err, res) {
+            if(err) {
+                callback(true, null);
+                return;
+            }
+            var value = null;
+            var empty = false;
+            if(res[0].topElements && res[0].topElements.length > 1) {
+                if(popFirstElement) value = res[0].topElements[0];
+                else value = res[0].topElements[1];
+            } else {
+                if(res[0].topElements) {
+                    value = res[0].topElements[0];
+                }
+                empty = true;
+            }
+
+            callback(value, empty);
+        })
+    }
+
+    execute(username, callback) {
+        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
+
+        var popFirstElement = this.request.position == "first";
+        var collection_key = this.request.collection_key
+        var that = this;
+
+        this.__getTop(username, collection_key, popFirstElement, function(value, willBeEmpty) {
+            that.__popItem(username, collection_key, popFirstElement, value, willBeEmpty, callback);
+        });
+    }
+}
+
 module.exports = {
     CollectionAddRequest: CollectionAddRequest,
-    CollectionFetchRequest: CollectionFetchRequest
+    CollectionFetchRequest: CollectionFetchRequest,
+    CollectionPopRequest: CollectionPopRequest
 }
