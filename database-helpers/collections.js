@@ -120,7 +120,7 @@ class CollectionPopRequest {
         });
     }
 
-    __getTop(username, collection_key, popFirstElement,  callback) {
+    __getTop(username, collection_key, popFirstElement, callback) {
         this.db.collection('users').aggregate([
             { $match: { username: username } },
             { $project: {
@@ -128,22 +128,29 @@ class CollectionPopRequest {
             }},
         ]).toArray(function(err, res) {
             if(err) {
-                callback(true, null);
+                callback(true, null, null);
                 return;
             }
+            // the result will be either: [firstItem, nextItem], [firstItem], [beforeLastItem, lastItem], [lastItem] or [] in case of empty array
+            // the cases represent diffrent states of the array before popping the value and the code below gets the required value (either 
+            // first item or last item depending on $popFirstElement). also checks if there are more items in the array (returned size is >= 1)
             var value = null;
             var empty = false;
             if(res[0].topElements && res[0].topElements.length > 1) {
                 if(popFirstElement) value = res[0].topElements[0];
                 else value = res[0].topElements[1];
             } else {
-                if(res[0].topElements) {
+                if(res[0].topElements.length == 1) {
                     value = res[0].topElements[0];
+                    empty = true;
+                } else {
+                    // There is no such item (probably array is already empty), we consider that case as an error
+                    callback(true, null, null);
+                    return;
                 }
-                empty = true;
             }
 
-            callback(value, empty);
+            callback(false, value, empty);
         })
     }
 
@@ -154,7 +161,12 @@ class CollectionPopRequest {
         var collection_key = this.request.collection_key
         var that = this;
 
-        this.__getTop(username, collection_key, popFirstElement, function(value, willBeEmpty) {
+        this.__getTop(username, collection_key, popFirstElement, function(err, value, willBeEmpty) {
+            if(err) {
+                callback(true, null);
+                return;
+            }
+
             that.__popItem(username, collection_key, popFirstElement, value, willBeEmpty, callback);
         });
     }
