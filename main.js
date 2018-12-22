@@ -1,5 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+var fs = require('fs');
+var morgan = require('morgan');
+var path = require('path');
 
 // DB Helpers
 const Users = require('./database-helpers/users');
@@ -31,6 +34,10 @@ usernameOrIpKeyGenerator = function(req) {
     if (req.body['username'] != null) return req.body.username;
     else return req.ip;
 };
+
+// Logger
+var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
+app.use(morgan('combined', { stream: accessLogStream }))
 
 // Setup Middlwares
 app.use(bodyParser.json());
