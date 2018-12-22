@@ -104,7 +104,31 @@ class CollectionPopRequest extends BaseRequest {
         });
     }
 
+    __getTopFromPairResponse(item, popFirstElement, callback) {
+        // the result will be either: [firstItem, nextItem], [firstItem], [beforeLastItem, lastItem], [lastItem] or [] in case of empty array
+        // the cases represent diffrent states of the array before popping the value and the code below gets the required value (either 
+        // first item or last item depending on $popFirstElement). also checks if there are more items in the array (returned size is >= 1)        
+        var value = null;
+        var empty = false;
+        if(item.topElements && item.topElements.length > 1) {
+            if(popFirstElement) value = item.topElements[0];
+            else value = item.topElements[1];
+        } else {
+            if(item.topElements.length == 1) {
+                value = item.topElements[0];
+                empty = true;
+            } else {
+                // There is no such item (probably array is already empty), we consider that case as an error
+                callback(true, null, null);
+                return;
+            }
+        }
+
+        callback(false, value, empty);
+    }
+
     __getTop(username, collection_key, popFirstElement, callback) {
+        var that = this;
         this.db.collection('users').aggregate([
             { $match: { username: username } },
             { $project: {
@@ -115,26 +139,9 @@ class CollectionPopRequest extends BaseRequest {
                 callback(true, null, null);
                 return;
             }
-            // the result will be either: [firstItem, nextItem], [firstItem], [beforeLastItem, lastItem], [lastItem] or [] in case of empty array
-            // the cases represent diffrent states of the array before popping the value and the code below gets the required value (either 
-            // first item or last item depending on $popFirstElement). also checks if there are more items in the array (returned size is >= 1)
-            var value = null;
-            var empty = false;
-            if(res[0].topElements && res[0].topElements.length > 1) {
-                if(popFirstElement) value = res[0].topElements[0];
-                else value = res[0].topElements[1];
-            } else {
-                if(res[0].topElements.length == 1) {
-                    value = res[0].topElements[0];
-                    empty = true;
-                } else {
-                    // There is no such item (probably array is already empty), we consider that case as an error
-                    callback(true, null, null);
-                    return;
-                }
-            }
-
-            callback(false, value, empty);
+            
+            const item = res[0];
+            that.__getTopFromPairResponse(item, popFirstElement, callback);
         })
     }
 

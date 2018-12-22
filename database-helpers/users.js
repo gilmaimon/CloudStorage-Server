@@ -69,57 +69,67 @@ module.exports = class Users {
         this.db = db;
     }
 
-    login(username, password, callback) {
-        var _db = this.db
-        this.db.collection("users").find({"username":username}).project({'username': true, 'password': true}).toArray(function(err, result){
-            if(result.length > 0) {
-                // username found
-                var storedHash = result[0].password;
-                bcrypt.compare(password, storedHash, function(err, doesMatch) {
-                    if(doesMatch) {
-                        // hash matched, user logged in
-                        callback(true, new User(_db, username))
-                    } else {
-                        // hash not matched
-                        callback(false, null);
-                    }
-                })
-                
-            }
-            else {
-                // username not found
-                callback(false, null);
-            }
+    __fetchUserDetais(username, callback) {
+        this.db.collection("users").find({"username":username}).project({'username': true, 'password': true}).toArray(function(err, result) {
+            if(!err && result.length > 0) callback(result[0]);
+            else callback(null);
         })
     }
-    
-    register(username, password, callback) {
+
+    login(username, password, callback) {
+        var db = this.db;
+        
+        this.__fetchUserDetais(username, function(userObj) {
+            if(userObj == null) {
+                callback(false, null);
+                return;
+            }
+
+            var storedHash = userObj.password;
+            bcrypt.compare(password, storedHash, function(err, doesMatch) {
+                if(!err && doesMatch) {
+                    // hash matched, user logged in
+                    callback(true, new User(db, username))
+                } else {
+                    // hash not matched
+                    callback(false, null);
+                }
+            });
+        })
+    }
+
+    // returns: error message as a string or null in case of no error
+    __validateRegisterParams(username, password) {
         if(username == null || password == null) {
-            callback(true, "missing parameters (username/password)");
-            return;
+            return "missing parameters (username/password)";
         }
 
         username = username.trim();
         password = password.trim();
 
-        var errorMsg = function(username, password) {
-            if(username.length < 4 || username.length > 16) return "Error: username longer than 16 or shorter than 4 characters";
-            if(password.length < 8 || password.length > 36) return "Error: password longer than 36 or shorter than 8 characters";
-            return null;
-        } (username, password);
+        if(username.length < 4 || username.length > 16) return "Error: username longer than 16 or shorter than 4 characters";
+        if(password.length < 8 || password.length > 36) return "Error: password longer than 36 or shorter than 8 characters";
 
-        if(errorMsg != null) {
-            callback(true, errorMsg);
-            return;
-        }
+        return null;
+    }
 
+    __registerUser(username, password, callback) {
         var db = this.db;
         bcrypt.hash(password, 5, function(err, hashedPassword) {
             db.collection("users").insertOne({"username":username, "password":hashedPassword}, function(err, otherthing) {
                 callback(Boolean(err), Boolean(err)? "Error: Username might be taken.": "OK");
             });
-         });         
+        });
+    }
+    
+    register(username, password, callback) {
+        error = this.__validateRegisterParams(username, password);
 
-        
+        if(error) {
+            callback(true, error);
+            return;
+        }
+
+        this.__registerUser(username, password, callback);
     }
 };

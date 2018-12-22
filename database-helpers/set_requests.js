@@ -30,15 +30,22 @@ class MultipleSetRequest extends BaseRequest {
         super(db, requestJson);
     }
 
+    __parseSubRequests(operations) {
+        for(var iOperation = 0; iOperation < operations.length; iOperation++) {
+            var subRequest = new SingleSetRequest(this.db, operations[iOperation]);
+            if(!subRequest.isValid()) {
+                console.log("Invalid: " + operations[iOperation]);
+                return false;
+            }
+            this.subRequests.push(subRequest);
+        }
+    }
+
     __parse(requestJson) {
         if(requestJson.hasOwnProperty('operations')) {
             this.subRequests = []
-            var operations = requestJson.operations;
-            for(var iOperation = 0; iOperation < operations.length; iOperation++) {
-                var subRequest = new SingleSetRequest(this.db, operations[iOperation]);
-                if(!subRequest.isValid()) return false;
-                this.subRequests.push(subRequest);
-            }
+            const operations = requestJson.operations;
+            this.__parseSubRequests(operations);
             return true;
         } 
         else return false;
@@ -52,7 +59,7 @@ class MultipleSetRequest extends BaseRequest {
             this.subRequests[iRequest].execute(username, function(err) {
                 errorResults.push(err)
                 if(subRequestsLen == errorResults.length) {
-                    callback(errorResults);
+                    callback(errorResults.includes(true));
                 }
             });
         }
