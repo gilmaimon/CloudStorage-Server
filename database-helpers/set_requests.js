@@ -1,11 +1,10 @@
-class SingleSetRequest {
+const BaseRequest = require('./base_request')
+
+class SingleSetRequest extends BaseRequest {
     constructor(db, requestJson) {
-        this.db = db;
-        this.__isValid = this.__parse(requestJson);
+        super(db, requestJson);
     }
 
-    // Returns boolean value indicating if the request 
-    // is valid or not (result means isValid)
     __parse(requestJson) {
         if (requestJson.hasOwnProperty('key') && requestJson.hasOwnProperty('value')) {
             this.request = {}
@@ -15,12 +14,7 @@ class SingleSetRequest {
         } else return false;
     }
 
-    isValid() {
-        return this.__isValid;
-    }
-
-    execute(username, callback) {
-        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
+    __executor(username, callback) {
         var update = {}
         update['data.' + this.request.key] = this.request.value
 
@@ -30,17 +24,15 @@ class SingleSetRequest {
     }
 }
 
-class MultipleSetRequest {
+
+class MultipleSetRequest extends BaseRequest {
     constructor(db, requestJson) {
-        this.db = db;
-        this.subRequests = []
-        this.__isValid = this.__parse(requestJson);
+        super(db, requestJson);
     }
 
-    // Returns boolean value indicating if the request 
-    // is valid or not (result means isValid)
     __parse(requestJson) {
         if(requestJson.hasOwnProperty('operations')) {
+            this.subRequests = []
             var operations = requestJson.operations;
             for(var iOperation = 0; iOperation < operations.length; iOperation++) {
                 var subRequest = new SingleSetRequest(this.db, operations[iOperation]);
@@ -52,12 +44,7 @@ class MultipleSetRequest {
         else return false;
     }
 
-    isValid() {
-        return this.__isValid;
-    }
-
-    execute(username, callback) {
-        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
+    __executor(username, callback) {
         var errorResults = []
         const subRequestsLen = this.subRequests.length;
         var iRequest = 0;
@@ -65,7 +52,6 @@ class MultipleSetRequest {
             this.subRequests[iRequest].execute(username, function(err) {
                 errorResults.push(err)
                 if(subRequestsLen == errorResults.length) {
-                    console.log("calling callback");
                     callback(errorResults);
                 }
             });
@@ -74,8 +60,6 @@ class MultipleSetRequest {
 }
 
 module.exports = class SetRequestFactory {
-    constructor() {}
-
     getRequest(db, requestJson) {
         if(requestJson.hasOwnProperty('operations')) {
             return new MultipleSetRequest(db, requestJson);

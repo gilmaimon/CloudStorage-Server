@@ -79,52 +79,55 @@ if(config.test_routes) {
     });
 }
 
+// Common response utility
+function respondResult(err, result, res) {
+    if(err) {
+        res.status(400).send({"error": true});
+    } else {
+        res.status(200);
+        var parsedResult = {};
+        parsedResult.error = false;
+        parsedResult['result'] = result;
+        res.send(parsedResult);
+    }
+}
+
+function respondEmpty(err, res) {
+    if(err) {
+        res.status(400).send({"error": true});
+    } else {
+        res.status(200).send({"error": false});
+    }
+}
+
 // Single Object Operations
 app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
-        res.status(err? 400: 200);
-        result["error"] = err;
-        res.send(result);
+        respondResult(err, result, res);
     });
 });
 app.post('/data/object', function (req, res) {
     req.userObj.put(req.body, function(err) {
-        res.status(err? 400: 200);
-        res.send({"error": err});
+        respondEmpty(err, res);
     });
 });
 
 // Collections Operations
 app.post('/data/collection', function (req, res) {
    req.userObj.add(req.body, function(err) {
-    res.status(err? 400: 200);   
-    res.send({"error": err});
+       respondEmpty(err, res);
    });
 });
 
 app.get('/data/collection', function(req, res) {
     req.userObj.filter(req.body, function(err, result) {
-        if(err) {
-            res.status(400).send({"error": true});
-        } else {
-            var parsedResult = {};
-            parsedResult.error = false;
-            parsedResult['result'] = result;
-            res.send(parsedResult);
-        }
+        respondResult(err, result, res);
     });
 });
 
 app.get('/data/collection/pop', function(req, res) {
     req.userObj.pop(req.body, function(err, result) {
-        if(err) {
-            res.status(400).send({"error": true});
-        } else {
-            var parsedResult = {};
-            parsedResult.error = false;
-            parsedResult['result'] = result;
-            res.send(parsedResult);
-        }
+        respondResult(err, result, res);
     });
 });
 

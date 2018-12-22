@@ -1,7 +1,8 @@
-class CollectionAddRequest {
+const BaseRequest = require('./base_request')
+
+class CollectionAddRequest extends BaseRequest {
     constructor(db, requestJson) {
-        this.db = db;
-        this.__isValid = this.__parse(requestJson);
+        super(db, requestJson);
     }
 
     // Returns boolean value indicating if the request 
@@ -15,12 +16,7 @@ class CollectionAddRequest {
         } else return false;
     }
 
-    isValid() {
-        return this.__isValid;
-    }
-
-    execute(username, callback) {
-        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
+    __executor(username, callback) {
         var update = {}
         update['data.' + this.request.collection_key] = this.request.value
 
@@ -38,10 +34,9 @@ function getNumberOrDefault(jsonObj, key, defaultValue) {
     }
 }
 
-class CollectionFetchRequest {
+class CollectionFetchRequest extends BaseRequest {
     constructor(db, requestJson) {
-        this.db = db;
-        this.__isValid = this.__parse(requestJson);
+        super(db, requestJson);
     }
 
     // Returns boolean value indicating if the request 
@@ -57,13 +52,7 @@ class CollectionFetchRequest {
         } else return false;
     }
 
-    isValid() {
-        return this.__isValid;
-    }
-
-    execute(username, callback) {
-        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
-
+    __executor(username, callback) {
         var projectBlock = null;
         if(this.request.from_last) {
             projectBlock = { $project: { 
@@ -92,10 +81,9 @@ class CollectionFetchRequest {
     }
 }
 
-class CollectionPopRequest {
+class CollectionPopRequest extends BaseRequest {
     constructor(db, requestJson) {
-        this.db = db;
-        this.__isValid = this.__parse(requestJson);
+        super(db, requestJson);
     }
 
     // Returns boolean value indicating if the request 
@@ -108,10 +96,6 @@ class CollectionPopRequest {
             this.request.collection_key = requestJson['collection_key'];
             return true;
         } else return false;
-    }
-
-    isValid() {
-        return this.__isValid;
     }
 
     __popItem(username, collection_key, popFirstElement, value, willBeEmpty, callback) {
@@ -154,9 +138,7 @@ class CollectionPopRequest {
         })
     }
 
-    execute(username, callback) {
-        if(!this.__isValid) throw Error("Requst is invalid (not parsed properly)");
-
+    __executor(username, callback) {
         var popFirstElement = this.request.position == "first";
         var collection_key = this.request.collection_key
         var that = this;
