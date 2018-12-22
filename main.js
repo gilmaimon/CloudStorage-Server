@@ -135,7 +135,7 @@ app.post('/user/register', function (req, res) {
         var password = req.body.password
 
         app.locals.users.register(username, password, function(error, msg) {
-            res.send({"error" : error, "message": msg, user: {username: username, password: password}})
+            res.send({"error" : error, "message": msg, username: username})
         });
     } else {
         res.status(400).send("400 - Registering not allowed");

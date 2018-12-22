@@ -8,6 +8,8 @@ const CollectionAddRequest = require('./collections').CollectionAddRequest;
 const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
 const CollectionPopRequest = require('./collections').CollectionPopRequest;
 
+const bcrypt = require('bcrypt');
+
 class User {
     constructor(db, username) {
         this.db = db;
@@ -69,11 +71,23 @@ module.exports = class Users {
 
     login(username, password, callback) {
         var _db = this.db
-        this.db.collection("users").find({"username":username, "password":password}).toArray(function(err, result){
+        this.db.collection("users").find({"username":username}).project({'username': true, 'password': true}).toArray(function(err, result){
             if(result.length > 0) {
-                callback(true, new User(_db, username))
+                // username found
+                var storedHash = result[0].password;
+                bcrypt.compare(password, storedHash, function(err, doesMatch) {
+                    if(doesMatch) {
+                        // hash matched, user logged in
+                        callback(true, new User(_db, username))
+                    } else {
+                        // hash not matched
+                        callback(false, null);
+                    }
+                })
+                
             }
             else {
+                // username not found
                 callback(false, null);
             }
         })
@@ -99,8 +113,13 @@ module.exports = class Users {
             return;
         }
 
-        this.db.collection("users").insertOne({"username":username, "password":password}, function(err, otherthing) {
-            callback(Boolean(err), Boolean(err)? "Error: Username might be taken.": "OK");
-        });
+        var db = this.db;
+        bcrypt.hash(password, 5, function(err, hashedPassword) {
+            db.collection("users").insertOne({"username":username, "password":hashedPassword}, function(err, otherthing) {
+                callback(Boolean(err), Boolean(err)? "Error: Username might be taken.": "OK");
+            });
+         });         
+
+        
     }
 };
