@@ -1,3 +1,5 @@
+<a href="https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability"><img src="https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability" /></a>
+
 # CloudStorage
 Simple backend for storing key/value pairs via http requests. Implemented with Node.js and MongoDB. Made for IOT projects.
 
