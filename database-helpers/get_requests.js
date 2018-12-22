@@ -1,5 +1,11 @@
 const BaseRequest = require('./base_request')
 
+function getFromDataWithProjection(db, username, projection, callback) {
+    db.collection('users').find({'username': username}).project(projection).toArray(function(err, result) {
+        callback(Boolean(err), result[0]['data']);
+   });
+}
+
 class SingleGetRequest extends BaseRequest {
     constructor(db, requestJson) {
         super(db, requestJson);
@@ -18,9 +24,7 @@ class SingleGetRequest extends BaseRequest {
         var projection = {}
         projection['data.' + this.request.key] = 1;
 
-       this.db.collection('users').find({'username': username}).project(projection).toArray(function(err, result) {
-            callback(Boolean(err), result[0]['data']);
-       });
+        getFromDataWithProjection(this.db, username, projection, callback);
     }
 }
 
@@ -44,10 +48,7 @@ class MultipleGetRequest extends BaseRequest {
         for(var iKey = 0; iKey < this.subKeys.length; iKey++) {
             projection['data.' + this.subKeys[iKey]] = 1;
         }
-
-       this.db.collection('users').find({'username': username}).project(projection).toArray(function(err, result) {
-            callback(Boolean(err), result[0]['data']);
-       });
+        getFromDataWithProjection(this.db, username, projection, callback);
     }
 }
 

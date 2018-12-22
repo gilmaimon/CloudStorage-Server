@@ -10,56 +10,46 @@ const CollectionPopRequest = require('./collections').CollectionPopRequest;
 
 const bcrypt = require('bcrypt');
 
+
+
 class User {
     constructor(db, username) {
         this.db = db;
         this.username = username
     }
 
-    get(requestJson, callback) {
-        var request = getRequestFactory.getRequest(this.db, requestJson);
-        if(request.isValid() == false) callback(true, {})
+    __tryRequest(request, callback) {
+        if(request.isValid() == false) {
+            callback(true);
+        }
         else {
             request.execute(this.username, callback);
         }
+    }
+
+    get(requestJson, callback) {
+        var request = getRequestFactory.getRequest(this.db, requestJson);
+        this.__tryRequest(request, callback);
     }
 
     put(requestJson, callback) {        
         var request = setRequestFactory.getRequest(this.db, requestJson);
-        if(request.isValid() == false) callback(true);
-        else {
-            request.execute(this.username, callback);
-        }
+        this.__tryRequest(request, callback);
     }
      
     add(requestJson, callback) {
         var request = new CollectionAddRequest(this.db, requestJson);
-        if(request.isValid() == false) {
-            callback(true);
-            return;
-        }
-
-        request.execute(this.username, callback);
+        this.__tryRequest(request, callback);
     }
 
     filter(requestJson, callback) {
         var request = new CollectionFetchRequest(this.db, requestJson);
-        if(request.isValid() == false) {
-            callback(true);
-            return;
-        }
-
-        request.execute(this.username, callback);
+        this.__tryRequest(request, callback);
     }
 
     pop(requestJson, callback) {
         var request = new CollectionPopRequest(this.db, requestJson);
-        if(request.isValid() == false) {
-            callback(false, null);
-            return;
-        }
-
-        request.execute(this.username, callback);
+        this.__tryRequest(request, callback);
     }
 }
 

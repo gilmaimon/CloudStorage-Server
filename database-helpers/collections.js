@@ -20,7 +20,11 @@ class CollectionAddRequest extends BaseRequest {
         var update = {}
         update['data.' + this.request.collection_key] = this.request.value
 
+        console.log("putting");
+        console.log(update);
+
         this.db.collection('users').updateOne({'username': username}, {$push: update}, function(err, doc) {
+            console.log(err);
             callback(Boolean(err));
         });
     }
@@ -108,23 +112,21 @@ class CollectionPopRequest extends BaseRequest {
         // the result will be either: [firstItem, nextItem], [firstItem], [beforeLastItem, lastItem], [lastItem] or [] in case of empty array
         // the cases represent diffrent states of the array before popping the value and the code below gets the required value (either 
         // first item or last item depending on $popFirstElement). also checks if there are more items in the array (returned size is >= 1)        
-        var value = null;
-        var empty = false;
         if(item.topElements && item.topElements.length > 1) {
-            if(popFirstElement) value = item.topElements[0];
-            else value = item.topElements[1];
+            if(popFirstElement) {
+                callback(false, item.topElements[0], false);
+            }
+            else {
+                callback(false, item.topElements[1], false);
+            }
         } else {
             if(item.topElements.length == 1) {
-                value = item.topElements[0];
-                empty = true;
+                callback(false, item.topElements[0], true);
             } else {
                 // There is no such item (probably array is already empty), we consider that case as an error
                 callback(true, null, null);
-                return;
             }
         }
-
-        callback(false, value, empty);
     }
 
     __getTop(username, collection_key, popFirstElement, callback) {
@@ -135,7 +137,7 @@ class CollectionPopRequest extends BaseRequest {
                 topElements: { $slice: [ "$data." + collection_key, popFirstElement? 0 : -2, 2] },
             }},
         ]).toArray(function(err, res) {
-            if(err) {
+            if(err || res.length == 0) {
                 callback(true, null, null);
                 return;
             }
