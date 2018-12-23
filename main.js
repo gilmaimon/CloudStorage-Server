@@ -88,7 +88,7 @@ function respond(err, res, result = {}) {
         res.status(200);
     }
 
-    res.send({"error": true, "result": result});
+    res.send({"error": err, "result": result});
 }
 
 // Single Object Operations
