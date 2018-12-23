@@ -20,11 +20,7 @@ class CollectionAddRequest extends BaseRequest {
         var update = {}
         update['data.' + this.request.collection_key] = this.request.value
 
-        console.log("putting");
-        console.log(update);
-
         this.db.collection('users').updateOne({'username': username}, {$push: update}, function(err, doc) {
-            console.log(err);
             callback(Boolean(err));
         });
     }

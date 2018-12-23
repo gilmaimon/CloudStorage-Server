@@ -1,6 +1,8 @@
 #vscode
 .vscode/
 
+node_modules/*
+
 # Logs
 logs
 *.log

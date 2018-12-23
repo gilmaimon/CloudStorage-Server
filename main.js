@@ -81,54 +81,44 @@ if(config.test_routes) {
 }
 
 // Common response utility
-function respondResult(err, result, res) {
+function respond(err, res, result = {}) {
     if(err) {
-        res.status(400).send({"error": true});
+        res.status(400);
     } else {
         res.status(200);
-        var parsedResult = {};
-        parsedResult.error = false;
-        parsedResult['result'] = result;
-        res.send(parsedResult);
     }
-}
 
-function respondEmpty(err, res) {
-    if(err) {
-        res.status(400).send({"error": true});
-    } else {
-        res.status(200).send({"error": false});
-    }
+    res.send({"error": true, "result": result});
 }
 
 // Single Object Operations
 app.get('/data/object', function (req, res) {
     req.userObj.get(req.body, function(err, result) {
-        respondResult(err, result, res);
+        respond(err, res, result);
     });
 });
 app.post('/data/object', function (req, res) {
     req.userObj.put(req.body, function(err) {
-        respondEmpty(err, res);
+        respond(err, res);
     });
 });
 
 // Collections Operations
 app.post('/data/collection', function (req, res) {
    req.userObj.add(req.body, function(err) {
-       respondEmpty(err, res);
+    respond(err, res);
    });
 });
 
 app.get('/data/collection', function(req, res) {
     req.userObj.filter(req.body, function(err, result) {
-        respondResult(err, result, res);
+        respond(err, res, result);
     });
 });
 
 app.get('/data/collection/pop', function(req, res) {
     req.userObj.pop(req.body, function(err, result) {
-        respondResult(err, result, res);
+        respond(err, res, result);
     });
 });
 
@@ -153,39 +143,6 @@ if(config.show_register_ui) {
         );
     });
 }
-
-var WebSocketServer = require('websocket').server;
-var http = require('http');
-
-var server = http.createServer(function(request, response) {
-  // process HTTP request. Since we're writing just WebSockets
-  // server we don't have to implement anything.
-});
-server.listen(config.web_sockets_port, function() { });
-wsServer = new WebSocketServer({
-    httpServer: server
-});
-
-wsServer.on('request', function(request) {
-    console.log((new Date()) + ' Connection from origin '
-      + request.origin + '.');
-    var connection = request.accept(null, request.origin);
-
-    connection.on('message', function(message) {
-        if (message.type === 'utf8') {
-            try {
-                requestObj = JSON.parse(message.utf8Data);
-                connection.send("Got it: " + JSON.stringify(requestObj));
-            } catch (error) {
-                connection.send("Error: cannot parse json");
-            }
-        }
-    });
-
-    connection.on('close', function(connection) {
-        console.log(connection.origin + " no longer connected");
-    });
-});
 
 // Connect to databae and run server
 var db = require('./database-helpers/database');
