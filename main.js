@@ -15,6 +15,7 @@ const RequestLogger = require('./middleware/request_logger')
 // Config
 const config = require('./config');
 config.port = config.port || 8080;
+config.web_sockets_port = config.web_sockets_port || 8181;
 config.verbose = config.verbose || false;
 config.allow_registering = config.allow_registering || false;
 config.test_routes = config.test_routes || false; 
@@ -152,6 +153,39 @@ if(config.show_register_ui) {
         );
     });
 }
+
+var WebSocketServer = require('websocket').server;
+var http = require('http');
+
+var server = http.createServer(function(request, response) {
+  // process HTTP request. Since we're writing just WebSockets
+  // server we don't have to implement anything.
+});
+server.listen(config.web_sockets_port, function() { });
+wsServer = new WebSocketServer({
+    httpServer: server
+});
+
+wsServer.on('request', function(request) {
+    console.log((new Date()) + ' Connection from origin '
+      + request.origin + '.');
+    var connection = request.accept(null, request.origin);
+
+    connection.on('message', function(message) {
+        if (message.type === 'utf8') {
+            try {
+                requestObj = JSON.parse(message.utf8Data);
+                connection.send("Got it: " + JSON.stringify(requestObj));
+            } catch (error) {
+                connection.send("Error: cannot parse json");
+            }
+        }
+    });
+
+    connection.on('close', function(connection) {
+        console.log(connection.origin + " no longer connected");
+    });
+});
 
 // Connect to databae and run server
 var db = require('./database-helpers/database');
