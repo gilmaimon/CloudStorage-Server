@@ -1,76 +1,38 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-var fs = require('fs');
-var morgan = require('morgan');
 var path = require('path');
 
-// DB Helpers
 const Users = require('./database-helpers/users');
-
-// Middleware
-const JsonKeyValidator = require('./middleware/json-validator');
-const UserLoginValidator = require('./middleware/login-validator')
-const RequestLogger = require('./middleware/request_logger')
-
-// Config
 const config = require('./config');
-config.port = config.port || 8080;
-config.web_sockets_port = config.web_sockets_port || 8181;
-config.verbose = config.verbose || false;
-config.allow_registering = config.allow_registering || false;
-config.test_routes = config.test_routes || false; 
-config.show_register_ui = config.show_register_ui || false;
-
-config.requests_limiter_window_minutes = config.requests_limiter_window_minutes || 15 * 60 * 1000;
-config.requests_limiter_max_requests = config.requests_limiter_max_requests || 500;
-
-config.slowdown_window_minutes = config.slowdown_window_minutes || 15 * 60 * 1000;
-config.slowdown_max_requests = config.slowdown_max_requests || 500;
-config.slowdown_delay_ms = config.slowdown_delay_ms || 500;
-
 var app = express()
 
-// returns as key (for limiting and slowing down requests) returns the username or the ip (if no username is provided)
-usernameOrIpKeyGenerator = function(req) {
-    if (req.body['username'] != null) return req.body.username;
-    else return req.ip;
-};
+/** Middlwares **/
 
-// Logger
-var accessLogStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' })
-app.use(morgan('combined', { stream: accessLogStream }))
+// access logger
+app.use(require('./middleware/logger'));
 
-// Setup Middlwares
+// body parsers
+const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// requests throttler and limiter
-const rateLimit = require("express-rate-limit");
-const limiter = rateLimit({
-    windowMs: config.requests_limiter_window_minutes * 60 * 1000,
-    max: config.requests_limiter_max_requests,
-    handler: function(req, res) {
-        res.status(429).send({error: true, message: "Too Many Requests. Wait and try again."});
-    },
-    keyGenerator: usernameOrIpKeyGenerator
-});
+// requests limit and rate limit
+app.use(require('./middleware/ratelimit').get(config));
+app.use(require('./middleware/slowdown').get(config));
 
-// requests slowdown
-const slowDown = require('express-slow-down');
-const speedLimiter = slowDown({
-    windowMs: config.slowdown_window_minutes * 60 * 1000, 
-    delayAfter: config.slowdown_max_requests,
-    delayMs: config.slowdown_delay_ms,
-    keyGenerator: usernameOrIpKeyGenerator
-});
-
-app.use(limiter);
-app.use(speedLimiter);
+// console.log request logger
+const RequestLogger = require('./middleware/request_logger')
 if(config.verbose) app.use(RequestLogger());
+
+// credentials validation
+const JsonKeyValidator = require('./middleware/json-validator');
 app.use('/data', JsonKeyValidator(['username', 'password']));
+
+const UserLoginValidator = require('./middleware/login-validator')
 app.use('/data', UserLoginValidator(app.locals.users))
 
-// Debug Routes
+/** Routes **/
+
+// Debug only Routes
 if(config.test_routes) {
     app.get('/', function(req, res) {
         res.end(JSON.stringify(req.body));
@@ -92,37 +54,40 @@ function respond(err, res, result = {}) {
 }
 
 // Single Object Operations
-app.get('/data/object', function (req, res) {
-    req.userObj.get(req.body, function(err, result) {
-        respond(err, res, result);
+
+app.route('/data/object')
+    .get(function (req, res) {
+        req.userObj.get(req.body, function(err, result) {
+            respond(err, res, result);
+        });
+    })
+    .post(function (req, res) {
+        req.userObj.put(req.body, function(err) {
+            respond(err, res);
+        });
     });
-});
-app.post('/data/object', function (req, res) {
-    req.userObj.put(req.body, function(err) {
-        respond(err, res);
-    });
-});
 
 // Collections Operations
-app.post('/data/collection', function (req, res) {
-   req.userObj.add(req.body, function(err) {
-    respond(err, res);
-   });
-});
-
-app.get('/data/collection', function(req, res) {
-    req.userObj.filter(req.body, function(err, result) {
-        respond(err, res, result);
+app.route('/data/collection')
+    .post(function (req, res) {
+        req.userObj.add(req.body, function(err) {
+            respond(err, res);
+        });
+    })
+    .get(function(req, res) {
+        req.userObj.filter(req.body, function(err, result) {
+            respond(err, res, result);
+        });
     });
-});
 
-app.get('/data/collection/pop', function(req, res) {
-    req.userObj.pop(req.body, function(err, result) {
-        respond(err, res, result);
+app.route('/data/collection/pop')
+    .get(function(req, res) {
+        req.userObj.pop(req.body, function(err, result) {
+            respond(err, res, result);
+        });
     });
-});
 
-// Route for Registering new users
+// Route for Registering new users (if config allows it)
 app.post('/user/register', function (req, res) {
     if(config.allow_registering) {   
         var username = req.body.username
@@ -136,10 +101,11 @@ app.post('/user/register', function (req, res) {
     }
 });
 
+// ui for registering new users (if config allows it)
 if(config.show_register_ui) {
     app.get('/user/register', function(req, res) {
         res.sendFile(
-            require('path').join(__dirname + '/ui/register/register.html')
+            path.join(__dirname + '/ui/register/register.html')
         );
     });
 }
