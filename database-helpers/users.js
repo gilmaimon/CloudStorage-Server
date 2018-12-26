@@ -113,7 +113,7 @@ module.exports = class Users {
     }
     
     register(username, password, callback) {
-        error = this.__validateRegisterParams(username, password);
+        var error = this.__validateRegisterParams(username, password);
 
         if(error) {
             callback(true, error);
