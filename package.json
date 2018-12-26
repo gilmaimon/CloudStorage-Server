@@ -1,0 +1,39 @@
+{
+  "name": "cloudstorage-server",
+  "version": "0.2.0",
+  "description": "<a href=\"https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability\"><img src=\"https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability\" /></a>",
+  "main": "main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.2",
+    "body-parser": "^1.18.3",
+    "chai": "^4.2.0",
+    "errorhandler": "^1.5.0",
+    "express": "^4.16.4",
+    "express-rate-limit": "^3.3.2",
+    "express-slow-down": "^1.1.1",
+    "mongodb": "^3.1.10",
+    "morgan": "^1.9.1",
+    "request": "^2.88.0",
+    "websocket": "^1.0.28",
+    "websockets": "^0.2.0"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gilmaimon/CloudStorage-Server.git"
+  },
+  "author": "Gil Maimon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gilmaimon/CloudStorage-Server/issues"
+  },
+  "homepage": "https://github.com/gilmaimon/CloudStorage-Server#readme"
+}
