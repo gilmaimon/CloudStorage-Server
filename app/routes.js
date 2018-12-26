@@ -57,11 +57,10 @@ function SetupCollectionAccessRoutes(app) {
         });
 }
 
-function SetupRegisterRoutes(app, config) {
+function SetupRegisterRoutes(app) {
     // Route for Registering new users (if config allows it)
     app.post('/user/register', function (req, res) {
-        console.log("Register allowed: " + config.allow_registering);
-        if(config.allow_registering) {   
+        if(app.locals.config.allow_registering) {   
             var username = req.body.username
             var password = req.body.password
 
@@ -75,22 +74,24 @@ function SetupRegisterRoutes(app, config) {
     });
 
     // ui for registering new users (if config allows it)
-    if(config.show_register_ui) {
-        app.get('/user/register', function(req, res) {
+    app.get('/user/register', function(req, res) {
+        if(app.locals.config.show_register_ui) {
             res.sendFile(
                 path.join(__dirname + '/ui/register/register.html')
             );
-        });
-    }
+        } else {
+            res.status(404).send('Not found');
+        }
+    });
 }
 
-module.exports = {SetupRoutes: function(app, config) {
+module.exports = {SetupRoutes: function(app) {
     // Debug only Routes
-    if(config.test_routes) {
+    if(app.locals.config.test_routes) {
         SetupTestRoutes(app);
     }
 
     SetupObjectAccessRoutes(app);
     SetupCollectionAccessRoutes(app);
-    SetupRegisterRoutes(app, config);
+    SetupRegisterRoutes(app);
 }}

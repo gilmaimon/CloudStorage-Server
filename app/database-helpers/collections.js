@@ -108,7 +108,12 @@ class CollectionPopRequest extends BaseRequest {
         // the result will be either: [firstItem, nextItem], [firstItem], [beforeLastItem, lastItem], [lastItem] or [] in case of empty array
         // the cases represent diffrent states of the array before popping the value and the code below gets the required value (either 
         // first item or last item depending on $popFirstElement). also checks if there are more items in the array (returned size is >= 1)        
-        if(item.topElements && item.topElements.length > 1) {
+        if(item.topElements == null) {
+            callback(true, null, null);
+            return;
+        }
+        
+        if(item.topElements.length > 1) {
             if(popFirstElement) {
                 callback(false, item.topElements[0], false);
             }

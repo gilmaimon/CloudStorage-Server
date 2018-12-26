@@ -11,7 +11,7 @@ module.exports = function validator() {
             }
             else {
                 res.status(401);
-                res.send('401: Access Denied - Bad Credentials.');
+                res.send({error: true, message: '401: Access Denied - Bad Credentials.'});
             }
         }) 
     }

@@ -10,10 +10,10 @@ const config = {
     "show_register_ui" : true,
     
     "requests_limiter_window_minutes": 15,
-    "requests_limiter_max_requests": 200,
+    "requests_limiter_max_requests": 2000,
 
     "slowdown_window_minutes": 15,
-    "slowdown_max_requests": 175,
+    "slowdown_max_requests": 1750,
     "slowdown_delay_ms": 50
 };
 

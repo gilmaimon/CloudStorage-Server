@@ -1,4 +1,4 @@
-module.exports = {AttachMiddlewares: function(app, config) {    
+module.exports = {AttachMiddlewares: function(app) {    
     // access logger
     app.use(require('./logger'));
     // body parsers
@@ -6,10 +6,10 @@ module.exports = {AttachMiddlewares: function(app, config) {
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     // requests limit and rate limit
-    app.use(require('./ratelimit').get(config));
-    app.use(require('./slowdown').get(config));
+    app.use(require('./ratelimit').get(app.locals.config));
+    app.use(require('./slowdown').get(app.locals.config));
     // console.log request logger
-    if(config.verbose) {
+    if(app.locals.config.verbose) {
         const RequestLogger = require('./request_logger')
         app.use(RequestLogger());
     }

@@ -1,20 +1,9 @@
 var expect = require("chai").expect;
 var randomstring = require('randomstring');
 
-var request = require('request')
+var sendRequest = require('./base_api_request')
 var config = require('../app/config')
 
-var base_url = "http://localhost:" + config.port;
-function sendRequest(path, method, bodyJson, callback) {
-    request({
-        uri: base_url + path,
-        method: method,
-        body: JSON.stringify(bodyJson),
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }, callback);
-}
 
 function testRegisterWithBadUsername(username) {
     var randomValidPassword = randomstring.generate({ length: 12, charset: 'alphabetic' });
@@ -65,18 +54,39 @@ describe("User Registration", function() {
 
     describe("Trying to register with valid credentials", function() {
         console.log({username: randomValidUsername, password: randomValidPassword});
-        it("Tries to register when registering is not allowed", function(done) {
-            config.allow_registering = false;
-            sendRequest('/user/register', 'POST', {username: randomValidUsername, password: randomValidPassword}, function(err, response, body) {
-                expect(err).to.equal(null);
-                expect(response.statusCode).to.equal(400);
-                var bodyJson = JSON.parse(body);
-                expect(bodyJson).to.not.equal(null);
-                expect(bodyJson.error).to.equal(true);
+        if(config.allow_registering) {
+            it("Tries to register when registering is allowed", function(done) {
+                sendRequest('/user/register', 'POST', {username: randomValidUsername, password: randomValidPassword}, function(err, response, body) {
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    done();
+                });
+            });
 
-                config.allow_registering = true;
-                done();
-            })
-        });
-    })
+            it("Tries to register with username that already exists", function(done) {
+                sendRequest('/user/register', 'POST', {username: randomValidUsername, password: randomValidPassword}, function(err, response, body) {
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(400);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(true);
+                    done();
+                });
+            });
+        } else {
+            it("Tries to register when registering is not allowed", function(done) {
+                sendRequest('/user/register', 'POST', {username: randomValidUsername, password: randomValidPassword}, function(err, response, body) {
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(400);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(true);
+                    done();
+                });
+            });
+        }
+    });
 });

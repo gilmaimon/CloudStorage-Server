@@ -9,7 +9,7 @@ module.exports = function validator(keys) {
 
         if(missingKeys.length > 0) {
             res.status(400);
-            res.send('400: Bad Request. Missing keys: [' + keys.join(', ') + ']');
+            res.send({error: true, message: '400: Bad Request. Missing keys: [' + keys.join(', ') + ']'});
         } else {
             next()
         }
