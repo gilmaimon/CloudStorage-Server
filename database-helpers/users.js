@@ -92,6 +92,8 @@ module.exports = class Users {
     __validateRegisterParams(username, password) {
         if(username == null || password == null) {
             return "missing parameters (username/password)";
+        } else if(typeof(username) != typeof(password) || typeof(username) != 'string') {
+            return "parameters (username/password) must be strings."
         }
 
         username = username.trim();

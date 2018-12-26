@@ -60,11 +60,13 @@ function SetupCollectionAccessRoutes(app) {
 function SetupRegisterRoutes(app, config) {
     // Route for Registering new users (if config allows it)
     app.post('/user/register', function (req, res) {
+        console.log("Register allowed: " + config.allow_registering);
         if(config.allow_registering) {   
             var username = req.body.username
             var password = req.body.password
 
             app.locals.users.register(username, password, function(error, msg) {
+                if(error) res.status(400);
                 res.send({"error" : error, "message": msg, username: username})
             });
         } else {
