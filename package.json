@@ -1,7 +1,7 @@
 {
   "name": "cloudstorage-server",
   "version": "0.2.0",
-  "description": "<a href=\"https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability\"><img src=\"https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability\" /></a>",
+  "description": "Simple backend for storing key/value pairs via http requests. Implemented with Node.js and MongoDB. Made for IOT projects",
   "main": "main.js",
   "directories": {
     "test": "tests"
