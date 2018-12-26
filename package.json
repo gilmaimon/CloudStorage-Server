@@ -25,7 +25,7 @@
     "mocha": "^5.2.0"
   },
   "scripts": {
-    "start": "node main.js",
+    "start": "node app/main.js",
     "test": "mocha"
   },
   "repository": {

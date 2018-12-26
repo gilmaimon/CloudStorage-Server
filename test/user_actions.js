@@ -2,7 +2,7 @@ var expect = require("chai").expect;
 var randomstring = require('randomstring');
 
 var request = require('request')
-var config = require('../config')
+var config = require('../app/config')
 
 var base_url = "http://localhost:" + config.port;
 function sendRequest(path, method, bodyJson, callback) {
