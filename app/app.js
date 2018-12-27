@@ -11,17 +11,20 @@ app.locals.config = require('./config');
 Middlwares.AttachMiddlewares(app);
 Routes.SetupRoutes(app);
 
-module.exports = {start: function() {
+module.exports = {start: function(callback) {
     // Connect to databae and run server
-    var db = require('./database-helpers/database');
-    db.initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
+    var dbHelper = require('./database-helpers/database');
+    dbHelper.initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
         if(!err) {
             app.locals.users = new Users(db);
             console.log("Server Listening on localhost:" + app.locals.config.port);
-            app.listen(app.locals.config.port, '0.0.0.0');
+            var server = app.listen(app.locals.config.port);
+            if(callback) callback(function() {
+                server.close();
+            });
         } else {
             console.log("Database init error");
+            if(callback) callback(null);
         }
     });
-    return app;
 }};

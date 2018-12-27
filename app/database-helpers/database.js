@@ -24,9 +24,9 @@ module.exports = {
         dbClient.connect(fullUrl, {useNewUrlParser:true}, function(err, db) {
             if (err) callback(true, null);
             else {
-                db = db.db("cloudstorage");
-                initDb(db);
-                callback(false, db);
+                cloudstorageDB = db.db("cloudstorage");
+                initDb(cloudstorageDB);
+                callback(false, cloudstorageDB);
             }
         })
     }

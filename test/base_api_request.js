@@ -12,3 +12,18 @@ module.exports = function sendRequest(path, method, bodyJson, callback) {
         }
     }, callback);
 }
+
+var closeHandler = null;
+
+before(function(done) {
+    server = require('../app/app').start(function(h) {
+        closeHandler = h;
+        done();
+    });
+})
+
+after(function(done) {
+    closeHandler();
+    process.exit();
+    done();
+})
