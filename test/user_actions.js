@@ -53,7 +53,6 @@ describe("User Registration", function() {
     });
 
     describe("Trying to register with valid credentials", function() {
-        console.log({username: randomValidUsername, password: randomValidPassword});
         if(config.allow_registering) {
             it("Tries to register when registering is allowed", function(done) {
                 sendRequest('/user/register', 'POST', {username: randomValidUsername, password: randomValidPassword}, function(err, response, body) {
