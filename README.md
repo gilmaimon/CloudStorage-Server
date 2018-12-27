@@ -1,4 +1,4 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability)](https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability) [![Build Status](https://travis-ci.org/gilmaimon/CloudStorage-Server.svg?branch=master)](https://travis-ci.org/gilmaimon/CloudStorage-Server)  [![Dependencies](https://david-dm.org/gilmaimon/CloudStorage-Server.svg)](https://david-dm.org/gilmaimon/CloudStorage-Server)
+[![Maintainability](https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability)](https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability) [![Build Status](https://travis-ci.org/gilmaimon/CloudStorage-Server.svg?branch=master)](https://travis-ci.org/gilmaimon/CloudStorage-Server)  [![Dependencies](https://david-dm.org/gilmaimon/CloudStorage-Server.svg)](https://david-dm.org/gilmaimon/CloudStorage-Server)  [![Dev Dependencies](https://david-dm.org/gilmaimon/CloudStorage-Server/dev-status.svg)](https://david-dm.org/gilmaimon/CloudStorage-Server?type=dev)
 
 
 # CloudStorage
