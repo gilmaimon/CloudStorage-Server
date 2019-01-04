@@ -17,6 +17,9 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
     // is valid or not (result means isValid)
     __parse(requestJson) {
         if (requestJson.hasOwnProperty('key') && requestJson.hasOwnProperty('action')) {
+
+            if((requestJson.action == 'max' || requestJson.action == 'min') && requestJson.value == null) return false;
+            
             this.request = {}
             this.request.key = requestJson['key']
             this.request.action = requestJson['action']
@@ -47,6 +50,40 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
         });
     }
 
+    
+    __currdate(username, callback) {
+        this.db.collection('users').findAndModify(
+            { username: username },
+            [],
+            { $currentDate: { ['data.' + this.request.key]: { $type: "timestamp" } } },
+            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
+        function(err, result) {
+            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
+        });
+    }
+
+    __max(username, callback, value) {
+        this.db.collection('users').findAndModify(
+            { username: username },
+            [],
+            { $max: { ['data.' + this.request.key]: value } },
+            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
+        function(err, result) {
+            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
+        });
+    }
+
+    __min(username, callback, value) {
+        this.db.collection('users').findAndModify(
+            { username: username },
+            [],
+            { $min: { ['data.' + this.request.key]: value } },
+            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
+        function(err, result) {
+            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
+        });
+    }
+
     __executor(username, callback) {
         var projection = {}
         projection['data.' + this.request.key] = 1;
@@ -66,6 +103,19 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
                 var value = getNumberOrDefault(this.request, 'value', 2);
                 this.__multiply(username, callback, value);
                 break;
+
+            case 'date':
+                this.__currdate(username, callback);
+                break;
+
+            case 'min':
+                this.__min(username, callback, this.request.value);
+                break;
+
+            case 'max':
+                this.__max(username, callback, this.request.value);
+                break;
+
             default: 
                 callback("Unkown action", null);
                 break;
