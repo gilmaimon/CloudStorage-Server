@@ -28,60 +28,36 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
         } else return false;
     }
 
-    __increment(username, callback, value) {
+    __findAndNotify(username, callback, operation) {
         this.db.collection('users').findAndModify(
             { username: username },
             [],
-            { $inc: { ['data.' + this.request.key]: value } },
+            operation,
             { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
         function(err, result) {
             callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
         });
     }
 
+    __increment(username, callback, value) {
+        this.__findAndNotify(username, callback, { $inc: { ['data.' + this.request.key]: value } });
+    }
+
     __multiply(username, callback, value) {
-        this.db.collection('users').findAndModify(
-            { username: username },
-            [],
-            { $mul: { ['data.' + this.request.key]: value } },
-            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
-        function(err, result) {
-            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
-        });
+        this.__findAndNotify(username, callback, { $mul: { ['data.' + this.request.key]: value } });
     }
 
     
     __currdate(username, callback) {
-        this.db.collection('users').findAndModify(
-            { username: username },
-            [],
-            { $currentDate: { ['data.' + this.request.key]: { $type: "timestamp" } } },
-            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
-        function(err, result) {
-            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
-        });
+        this.__findAndNotify(username, callback, { $currentDate: { ['data.' + this.request.key]: { $type: "timestamp" } } });
     }
 
     __max(username, callback, value) {
-        this.db.collection('users').findAndModify(
-            { username: username },
-            [],
-            { $max: { ['data.' + this.request.key]: value } },
-            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
-        function(err, result) {
-            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
-        });
+        this.__findAndNotify(username, callback, { $max: { ['data.' + this.request.key]: value } });
     }
 
     __min(username, callback, value) {
-        this.db.collection('users').findAndModify(
-            { username: username },
-            [],
-            { $min: { ['data.' + this.request.key]: value } },
-            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
-        function(err, result) {
-            callback(Boolean(err)? "Operation failed. Might be overflow": false, Boolean(err)? null: result['value']['data']);
-        });
+        this.__findAndNotify(username, callback, { $min: { ['data.' + this.request.key]: value } });
     }
 
     __executor(username, callback) {
