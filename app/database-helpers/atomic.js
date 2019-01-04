@@ -1,12 +1,5 @@
 const BaseRequest = require('./base_request')
-
-function getNumberOrDefault(jsonObj, key, defaultValue) {
-    if(jsonObj.hasOwnProperty(key) && !isNaN(jsonObj[key])) {
-        return jsonObj[key];
-    } else {
-        return defaultValue;
-    }
-}
+const getNumberOrDefault = require('../utils').getNumberOrDefault
 
 module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends BaseRequest {
     constructor(db, requestJson) {
