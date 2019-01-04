@@ -87,7 +87,7 @@ describe("Atomic Object Operations", function() {
             });
         });
 
-        it("Increments the last set key (from 0 to 1) and fetches it", function(done) {
+        it("Decrement the last key by 1 and fetch it (Should be 9)", function(done) {
             sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "SomeKeyD", action: "dec"}, function(err, response, body) {                
                 expect(err).to.equal(null);
                 expect(response.statusCode).to.equal(200);
@@ -100,7 +100,7 @@ describe("Atomic Object Operations", function() {
             });
         });
 
-        it("Increments a new key by 5 and fetches it", function(done) {
+        it("Decrements a new key by 5 and fetches it", function(done) {
             sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "newkeyD", action: "dec", value: 5}, function(err, response, body) {                
                 expect(err).to.equal(null);
                 expect(response.statusCode).to.equal(200);
@@ -113,4 +113,65 @@ describe("Atomic Object Operations", function() {
             });
         });
     });
+
+    describe("multiply operations", function() {
+        it("Set item to 3 and fetches it", function(done) {
+            sendRequest('/data/object', 'POST', {username: randomValidUsername, password: randomValidPassword, key: "SomeKeyM", value: 3}, function(err, response, body) {                
+                expect(err).to.equal(null);
+                expect(response.statusCode).to.equal(200);
+                var bodyJson = JSON.parse(body);
+                expect(bodyJson).to.not.equal(null);
+                expect(bodyJson.error).to.equal(false);
+                sendRequest('/data/object', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "SomeKeyM"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result['SomeKeyM']).to.equal(3);
+                    done();
+                });
+            });
+        });
+
+        it("Multiply by default (2) the last set key (from 3 to 6) and fetches it", function(done) {
+            sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "SomeKeyM", action: "mul"}, function(err, response, body) {                
+                expect(err).to.equal(null);
+                expect(response.statusCode).to.equal(200);
+                var bodyJson = JSON.parse(body);
+                expect(bodyJson).to.not.equal(null);
+                expect(bodyJson.error).to.equal(false);
+                expect(bodyJson.result).to.not.equal(null);
+                expect(bodyJson.result['SomeKeyM']).to.equal(6);
+                done();
+            });
+        });
+        
+        it("Multiply by 10 the last set key (from 6 to 60) and fetches it", function(done) {
+            sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "SomeKeyM", action: "mul", value: 10}, function(err, response, body) {                
+                expect(err).to.equal(null);
+                expect(response.statusCode).to.equal(200);
+                var bodyJson = JSON.parse(body);
+                expect(bodyJson).to.not.equal(null);
+                expect(bodyJson.error).to.equal(false);
+                expect(bodyJson.result).to.not.equal(null);
+                expect(bodyJson.result['SomeKeyM']).to.equal(60);
+                done();
+            });
+        });
+
+        it("Multiplies a new key by 5 and fetches it", function(done) {
+            sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "newkeyM", action: "mul", value: 5}, function(err, response, body) {                
+                expect(err).to.equal(null);
+                expect(response.statusCode).to.equal(200);
+                var bodyJson = JSON.parse(body);
+                expect(bodyJson).to.not.equal(null);
+                expect(bodyJson.error).to.equal(false);
+                expect(bodyJson.result).to.not.equal(null);
+                expect(bodyJson.result['newkeyM']).to.equal(0);
+                done();
+            });
+        });
+    });
+
 });
