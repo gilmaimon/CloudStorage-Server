@@ -8,9 +8,9 @@ const CollectionAddRequest = require('./collections').CollectionAddRequest;
 const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
 const CollectionPopRequest = require('./collections').CollectionPopRequest;
 
+const AtmoicOperationRequest = require('./atomic').AtmoicOperationRequest;
+
 const bcrypt = require('bcrypt');
-
-
 
 class User {
     constructor(db, username) {
@@ -49,6 +49,11 @@ class User {
 
     pop(requestJson, callback) {
         var request = new CollectionPopRequest(this.db, requestJson);
+        this.__tryRequest(request, callback);
+    }
+
+    atomic(requestJson, callback) {
+        var request = new AtmoicOperationRequest(this.db, requestJson);
         this.__tryRequest(request, callback);
     }
 }

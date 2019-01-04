@@ -33,6 +33,18 @@ function SetupObjectAccessRoutes(app) {
                 respond(err, res);
             });
         });
+    
+        app.route('/data/object/atomic')
+            .get(function(req, res) {
+                req.userObj.atomic(req.body, function(err, result) {
+                    respond(err, res, result);
+                })
+            })
+            .post(function(req, res) {
+                req.userObj.atomic(req.body, function(err) {
+                    respond(err, res);
+                })
+            });
 }
 
 // Collections Operations
