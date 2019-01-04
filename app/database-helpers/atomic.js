@@ -85,9 +85,6 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
     }
 
     __executor(username, callback) {
-        var projection = {}
-        projection['data.' + this.request.key] = 1;
-
         switch(this.request.action) {
             case 'inc':
                 var value = getNumberOrDefault(this.request, 'value', 1);
@@ -118,7 +115,6 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
 
             default: 
                 callback("Unkown action", null);
-                break;
         }
     }
 }}
