@@ -172,6 +172,131 @@ describe("Atomic Object Operations", function() {
                 done();
             });
         });
+
+        describe("MinMax operations", function() {
+            it("Set item to 10 and fetches it", function(done) {
+                sendRequest('/data/object', 'POST', {username: randomValidUsername, password: randomValidPassword, key: "k", value: 10}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    sendRequest('/data/object', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k"}, function(err, response, body) {                
+                        expect(err).to.equal(null);
+                        expect(response.statusCode).to.equal(200);
+                        var bodyJson = JSON.parse(body);
+                        expect(bodyJson).to.not.equal(null);
+                        expect(bodyJson.error).to.equal(false);
+                        expect(bodyJson.result['k']).to.equal(10);
+                        done();
+                    });
+                });
+            });
+
+            
+            it("Tries to use max without a value", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "max"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(400);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.not.equal(false);
+                    done();
+                });
+            });            
+            it("Tries to use min without a value", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "min"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(400);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.not.equal(false);
+                    done();
+                });
+            });
+
+            it("Successfully maxes value with 100", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "max", value: 100}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(100);
+                    done();
+                });
+            });
+
+            it("Successfully maxes value with 101", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "max", value: 101}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(101);
+                    done();
+                });
+            });
+
+            
+            it("Successfully tries to max value with 90", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "max", value: 90}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(101);
+                    done();
+                });
+            });
+                        
+            it("Successfully mins value with 90", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "min", value: 90}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(90);
+                    done();
+                });
+            });
+
+                                    
+            it("Successfully mins value with -100", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "min", value: -100}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(-100);
+                    done();
+                });
+            });
+
+                                                
+            it("Successfully tries to min value with -1", function(done) {
+                sendRequest('/data/object/atomic', 'GET', {username: randomValidUsername, password: randomValidPassword, key: "k", action: "min", value: -1}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result.k).to.not.equal(null);
+                    expect(bodyJson.result.k).to.equal(-100);
+                    done();
+                });
+            });
+
+        })
     });
 
 });
