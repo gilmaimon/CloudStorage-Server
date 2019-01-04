@@ -24,6 +24,17 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
             return true;
         } else return false;
     }
+
+    __increment(username, callback, value) {
+        this.db.collection('users').findAndModify(
+            { username: username },
+            [],
+            { $inc: { ['data.' + this.request.key]: value } },
+            { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
+        function(err, result) {
+            callback(Boolean(err), result['value']['data']);
+        });
+    }
     __executor(username, callback) {
         var projection = {}
         projection['data.' + this.request.key] = 1;
@@ -31,14 +42,12 @@ module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends B
         switch(this.request.action) {
             case 'inc':
                 var value = getNumberOrDefault(this.request, 'value', 1);
-                this.db.collection('users').findAndModify(
-                    { username: username },
-                    [],
-                    { $inc: { ['data.' + this.request.key]: value } },
-                    { upsert: true, new: true, fields: {['data.' + this.request.key]: 1} },
-                function(err, result) {
-                    callback(Boolean(err), result['value']['data']);
-                });
+                this.__increment(username, callback, value);
+                break;
+            
+            case 'dec':
+                var value = getNumberOrDefault(this.request, 'value', 1);
+                this.__increment(username, callback, -value);
                 break;
             default: 
                 callback("Unkown action", null);
