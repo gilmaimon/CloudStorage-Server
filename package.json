@@ -1,6 +1,6 @@
 {
   "name": "cloudstorage-server",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "Simple backend for storing key/value pairs via http requests. Implemented with Node.js and MongoDB. Made for IOT projects",
   "main": "main.js",
   "directories": {
