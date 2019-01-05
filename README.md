@@ -21,4 +21,4 @@ View the Arduino Client: [`Arduino-CloudStorage`](https://github.com/gilmaimon/A
 ##### Atomics:
 - Increment/Decrement an item
 - Update an item if it is smaller/bigger than provided value (server-side min/max)
-- set key to hold current time in millis (server side)
+- Set key to hold current time in millis (server side)
