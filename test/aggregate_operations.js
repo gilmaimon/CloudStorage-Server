@@ -236,4 +236,48 @@ describe("Aggregate Object Operations", function() {
         });
     });
 
+    describe("Tests Count", function() {
+        it("Gets the size of the raw array and compares it to 8", function(done) {
+            sendRequest('/data/collection/aggregate', 'GET', {username: randomValidUsername, password: randomValidPassword, 
+                collection_key: "raw", action: "count"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result).to.not.equal(true);
+                    expect(bodyJson.result).to.equal(8);                    
+                    done();
+            });
+        })
+
+        it("Gets the size of the complex array and compares it to 7", function(done) {
+            sendRequest('/data/collection/aggregate', 'GET', {username: randomValidUsername, password: randomValidPassword, 
+                collection_key: "complex", action: "count"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result).to.not.equal(true);
+                    expect(bodyJson.result).to.equal(7);                    
+                    done();
+            });
+        })
+
+        it("Gets the size of the mergable array and compares it to 3", function(done) {
+            sendRequest('/data/collection/aggregate', 'GET', {username: randomValidUsername, password: randomValidPassword, 
+                collection_key: "mergable", action: "count"}, function(err, response, body) {                
+                    expect(err).to.equal(null);
+                    expect(response.statusCode).to.equal(200);
+                    var bodyJson = JSON.parse(body);
+                    expect(bodyJson).to.not.equal(null);
+                    expect(bodyJson.error).to.equal(false);
+                    expect(bodyJson.result).to.not.equal(true);
+                    expect(bodyJson.result).to.equal(3);                    
+                    done();
+            });
+        })
+    })
+
 });

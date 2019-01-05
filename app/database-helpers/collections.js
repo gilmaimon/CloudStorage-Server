@@ -214,6 +214,20 @@ class AggregateRequest extends BaseRequest {
         });
     }
 
+    __countElements(username, callback) {
+        this.db.collection('users').aggregate([
+            { $match: { username: username } },
+            { $project: { 'length': {$size: '$data.' + this.request.collection_key} } },
+        ]).toArray(function(err, res) {
+            if(err || res.length == 0) {
+                callback(true, null, null);
+                return;
+            }
+
+            callback(false, res[0]['length']);
+        });
+    }
+
     __requireSubkey() {
         if(this.request.subkey == null) {
             this.request.subkey = this.request.collection_key
@@ -248,6 +262,10 @@ class AggregateRequest extends BaseRequest {
                     
             case 'sum':
                 this.__groupBy(username, { $sum: "$data." + this.request.collection_key }, callback);
+                break;
+
+            case 'count':
+                this.__countElements(username, callback);
                 break;
 
             default:
