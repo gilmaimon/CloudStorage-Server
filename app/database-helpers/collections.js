@@ -195,6 +195,25 @@ class AggregateRequest extends BaseRequest {
         });
     }
 
+    __groupBy(username, groupExpression, callback) {
+        this.db.collection('users').aggregate([
+            { $match: { username: username } },
+            { $project: {['data.' + this.request.collection_key]: 1} },
+            { $unwind: { path: '$data.' + this.request.collection_key} },
+            { $group : {
+                _id: null,
+                result: groupExpression
+            }}
+        ]).toArray(function(err, res) {
+            if(err || res.length == 0) {
+                callback(true, null, null);
+                return;
+            }
+
+            callback(false, res[0]['result']);
+        });
+    }
+
     __requireSubkey() {
         if(this.request.subkey == null) {
             this.request.subkey = this.request.collection_key
@@ -204,7 +223,6 @@ class AggregateRequest extends BaseRequest {
     }
 
     __executor(username, callback) {
-        var collection_key = this.request.collection_key
         switch(this.request.action) {
             case 'max':
                 this.__requireSubkey();
@@ -214,6 +232,22 @@ class AggregateRequest extends BaseRequest {
             case 'min':
                 this.__requireSubkey();
                 this.__getMinMaxElement(username, callback, true);
+                break;
+
+            case 'merge':
+                this.__groupBy(username, { $mergeObjects: "$data." + this.request.collection_key }, callback);
+                break;
+
+            case 'unique':
+                this.__groupBy(username, { $addToSet: "$data." + this.request.collection_key }, callback);
+                break;
+            
+            case 'average':
+                this.__groupBy(username, { $avg: "$data." + this.request.collection_key }, callback);
+                break;
+                    
+            case 'sum':
+                this.__groupBy(username, { $sum: "$data." + this.request.collection_key }, callback);
                 break;
 
             default:
