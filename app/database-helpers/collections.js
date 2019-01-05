@@ -158,8 +158,106 @@ class CollectionPopRequest extends BaseRequest {
     }
 }
 
+class AggregateRequest extends BaseRequest {
+    constructor(db, requestJson) {
+        super(db, requestJson);
+    }
+
+    // Returns boolean value indicating if the request 
+    // is valid or not (result means isValid)
+    __parse(requestJson) {
+        if (requestJson.hasOwnProperty('collection_key') && requestJson.hasOwnProperty('action')) {
+            this.request = {}
+            this.request.collection_key = requestJson['collection_key'];
+            this.request.subkey = requestJson['subkey'];
+            this.request.action = requestJson['action'];
+            return true;
+        } else return false;
+    }
+
+    __getMinMaxElement(username, callback, isMin) {
+        this.db.collection('users').aggregate([
+            { $match: { username: username } },
+            { $project: {['data.' + this.request.collection_key]: 1} },
+            { $unwind: { path: '$data.' + this.request.collection_key} },
+            { $sort : {['data.' + this.request.subkey]: isMin? 1: -1} },
+            { $group : {
+                _id: null,
+                result: { $first: "$data." + this.request.collection_key }
+            }}
+        ]).toArray(function(err, res) {
+            if(err || res.length == 0) {
+                callback(true, null, null);
+                return;
+            }
+
+            callback(false, res[0]['result']);
+        });
+    }
+
+    __groupBy(username, groupExpression, callback) {
+        this.db.collection('users').aggregate([
+            { $match: { username: username } },
+            { $project: {['data.' + this.request.collection_key]: 1} },
+            { $unwind: { path: '$data.' + this.request.collection_key} },
+            { $group : {
+                _id: null,
+                result: groupExpression
+            }}
+        ]).toArray(function(err, res) {
+            if(err || res.length == 0) {
+                callback(true, null, null);
+                return;
+            }
+
+            callback(false, res[0]['result']);
+        });
+    }
+
+    __requireSubkey() {
+        if(this.request.subkey == null) {
+            this.request.subkey = this.request.collection_key
+        } else {
+            this.request.subkey = this.request.collection_key + '.' + this.request.subkey;
+        }
+    }
+
+    __executor(username, callback) {
+        switch(this.request.action) {
+            case 'max':
+                this.__requireSubkey();
+                this.__getMinMaxElement(username, callback, false);
+                break;
+            
+            case 'min':
+                this.__requireSubkey();
+                this.__getMinMaxElement(username, callback, true);
+                break;
+
+            case 'merge':
+                this.__groupBy(username, { $mergeObjects: "$data." + this.request.collection_key }, callback);
+                break;
+
+            case 'unique':
+                this.__groupBy(username, { $addToSet: "$data." + this.request.collection_key }, callback);
+                break;
+            
+            case 'average':
+                this.__groupBy(username, { $avg: "$data." + this.request.collection_key }, callback);
+                break;
+                    
+            case 'sum':
+                this.__groupBy(username, { $sum: "$data." + this.request.collection_key }, callback);
+                break;
+
+            default:
+                callback("Unkown action", null);
+        }
+    }
+}
 module.exports = {
     CollectionAddRequest: CollectionAddRequest,
     CollectionFetchRequest: CollectionFetchRequest,
-    CollectionPopRequest: CollectionPopRequest
+    CollectionPopRequest: CollectionPopRequest,
+    AggregateRequest: AggregateRequest
 }

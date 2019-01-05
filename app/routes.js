@@ -67,6 +67,13 @@ function SetupCollectionAccessRoutes(app) {
                 respond(err, res, result);
             });
         });
+
+    app.route('/data/collection/aggregate')
+        .get(function(req, res) {
+            req.userObj.aggregate(req.body, function(err, result) {
+                respond(err, res, result);
+            })
+        });
 }
 
 function SetupRegisterRoutes(app) {
