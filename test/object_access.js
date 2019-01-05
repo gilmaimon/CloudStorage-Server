@@ -26,7 +26,7 @@ describe("Single Object Operations", function() {
                 expect(response.statusCode).to.equal(400);
                 var bodyJson = JSON.parse(body);
                 expect(bodyJson).to.not.equal(null);
-                expect(bodyJson.error).to.equal(true);
+                expect(bodyJson.error).to.not.equal(false);
                 done();
             });
         });
@@ -37,7 +37,7 @@ describe("Single Object Operations", function() {
                 expect(response.statusCode).to.equal(400);
                 var bodyJson = JSON.parse(body);
                 expect(bodyJson).to.not.equal(null);
-                expect(bodyJson.error).to.equal(true);
+                expect(bodyJson.error).to.not.equal(false);
                 done();
             });
         });
@@ -48,7 +48,7 @@ describe("Single Object Operations", function() {
                 expect(response.statusCode).to.equal(400);
                 var bodyJson = JSON.parse(body);
                 expect(bodyJson).to.not.equal(null);
-                expect(bodyJson.error).to.equal(true);
+                expect(bodyJson.error).to.not.equal(false);
                 done();
             });
         });
