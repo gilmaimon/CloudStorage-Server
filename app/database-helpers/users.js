@@ -7,7 +7,7 @@ var getRequestFactory = new GetRequestFactory()
 const CollectionAddRequest = require('./collections').CollectionAddRequest;
 const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
 const CollectionPopRequest = require('./collections').CollectionPopRequest;
-
+const AggregateRequest = require('./collections').AggregateRequest;
 const AtmoicOperationRequest = require('./atomic').AtmoicOperationRequest;
 
 const bcrypt = require('bcrypt');
@@ -20,7 +20,7 @@ class User {
 
     __tryRequest(request, callback) {
         if(request.isValid() == false) {
-            callback(true);
+            callback("Error: Request could not be parsed (Missing/Wrong parameters?)");
         }
         else {
             request.execute(this.username, callback);
@@ -54,6 +54,11 @@ class User {
 
     atomic(requestJson, callback) {
         var request = new AtmoicOperationRequest(this.db, requestJson);
+        this.__tryRequest(request, callback);
+    }
+
+    aggregate(requestJson, callback) {
+        var request = new AggregateRequest(this.db, requestJson);
         this.__tryRequest(request, callback);
     }
 }
