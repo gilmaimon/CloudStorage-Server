@@ -11,12 +11,13 @@ function respond(err, res, result = {}) {
     res.send({"error": err, "result": result});
 }
 
+var package = require('../package.json');
 function SetupTestRoutes(app) {
     app.get('/', function(req, res) {
-        res.end(JSON.stringify(req.body));
+        res.send({version: package.version});
     });
     app.post('/', function(req, res) {
-        res.end(JSON.stringify(req.body));
+        res.send({version: package.version});
     });
 }
 
