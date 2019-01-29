@@ -1,4 +1,4 @@
-const BaseRequest = require('./base_request')
+const BaseRequest = require('../base_request')
 
 class SingleSetRequest extends BaseRequest {
     constructor(db, requestJson) {

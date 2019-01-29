@@ -1,4 +1,4 @@
-const BaseRequest = require('./base_request')
+const BaseRequest = require('../base_request')
 const getNumberOrDefault = require('../utils').getNumberOrDefault
 
 module.exports = {AtmoicOperationRequest: class AtmoicOperationRequest extends BaseRequest {

@@ -1,20 +1,20 @@
 // Config
 const config = {
-    "port" :80,
-    "web_sockets_port": 1800,
-    "mongodb_url": "mongodb://localhost:27017",
-    "verbose" : false,
-    "allow_registering" : true,
-    "test_routes" : true,
+    port :80,
+    web_sockets_port: 1800,
+    mongodb_url: "mongodb://localhost:27017",
+    verbose : false,
+    allow_registering : true,
+    test_routes : true,
 
-    "show_register_ui" : true,
+    show_register_ui : true,
     
-    "requests_limiter_window_minutes": 15,
-    "requests_limiter_max_requests": 2000,
+    requests_limiter_window_minutes: 15,
+    requests_limiter_max_requests: 2000,
 
-    "slowdown_window_minutes": 15,
-    "slowdown_max_requests": 1750,
-    "slowdown_delay_ms": 50
+    slowdown_window_minutes: 15,
+    slowdown_max_requests: 1750,
+    slowdown_delay_ms: 50
 };
 
 config.port = config.port || 8080;

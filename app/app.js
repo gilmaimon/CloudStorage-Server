@@ -1,20 +1,30 @@
 const express = require('express');
 
-const Users = require('./database-helpers/users');
-
-const Middlwares = require('./middleware/middlewares');
-const Routes = require('./routes');
-
+const Users = require('./users/users');
 var app = express()
 app.locals.config = require('./config');
 
-Middlwares.AttachMiddlewares(app);
-Routes.SetupRoutes(app);
+// Middlewares
+require('./middlewares/logger/logger').attach(app);
+require('./middlewares/parsers/parsers').attach(app);
+require('./middlewares/limiters/limiters').attach(app);
+require('./middlewares/logger/request_logger').attach(app);
+require('./middlewares/validators/validators').attach(app);
+
+// Routes
+require('./routes/objects/objects_route').use(app);
+require('./routes/collections/collections_route').use(app);
+if(app.locals.config.test_routes) {
+    require('./routes/home/home_route').use(app);
+}
+if(app.locals.config.allow_registering) {
+    require('./routes/register/register_route').use(app);
+}
 
 module.exports = {
     start: function(callback) {
         // Connect to databae and run server
-        var dbHelper = require('./database-helpers/database');
+        var dbHelper = require('./database');
         dbHelper.initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
             if(!err) {
                 app.locals.users = new Users(db);

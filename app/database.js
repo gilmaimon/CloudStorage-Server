@@ -1,17 +1,10 @@
 function initDb(db) {
     // init users collection and indexes
     db.createCollection('users', {
-        validator: { $and: [ 
-            {
-                "username": {
-                    $type: "string", 
-                    $exists: true
-                },
-                "password": {
-                    $type: "string", 
-                    $exists: true
-                }
-    }]}}, function(err, collection) {
+        validator: { $and: [{
+            "username": { $type: "string", $exists: true },
+            "password": { $type: "string", $exists: true }
+        }]}}, function(err, collection) {
         console.log("Database Ready");
     });
     db.collection('users').createIndex( {'username': 1}, { unique: true } );

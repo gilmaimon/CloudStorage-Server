@@ -1,4 +1,4 @@
-const BaseRequest = require('./base_request')
+const BaseRequest = require('../base_request')
 
 function getFromDataWithProjection(db, username, projection, callback) {
     db.collection('users').find({'username': username}).project(projection).toArray(function(err, result) {

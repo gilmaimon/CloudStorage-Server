@@ -1,14 +1,14 @@
-const SetRequestFactory = require('./set_requests');
+const SetRequestFactory = require('../routes/objects/set_requests');
 var setRequestFactory = new SetRequestFactory()
 
-const GetRequestFactory = require('./get_requests');
+const GetRequestFactory = require('../routes/objects/get_requests');
 var getRequestFactory = new GetRequestFactory()
 
-const CollectionAddRequest = require('./collections').CollectionAddRequest;
-const CollectionFetchRequest = require('./collections').CollectionFetchRequest;
-const CollectionPopRequest = require('./collections').CollectionPopRequest;
-const AggregateRequest = require('./collections').AggregateRequest;
-const AtmoicOperationRequest = require('./atomic').AtmoicOperationRequest;
+const CollectionAddRequest = require('../routes/collections/collections').CollectionAddRequest;
+const CollectionFetchRequest = require('../routes/collections/collections').CollectionFetchRequest;
+const CollectionPopRequest = require('../routes/collections/collections').CollectionPopRequest;
+const AggregateRequest = require('../routes/collections/collections').AggregateRequest;
+const AtmoicOperationRequest = require('../routes/objects/atomic').AtmoicOperationRequest;
 
 const bcrypt = require('bcrypt');
 
