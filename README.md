@@ -1,7 +1,7 @@
 [![Dependencies](https://david-dm.org/gilmaimon/CloudStorage-Server.svg)](https://david-dm.org/gilmaimon/CloudStorage-Server)  [![Dev Dependencies](https://david-dm.org/gilmaimon/CloudStorage-Server/dev-status.svg)](https://david-dm.org/gilmaimon/CloudStorage-Server?type=dev) [![Maintainability](https://api.codeclimate.com/v1/badges/0284157266c2fe66ff86/maintainability)](https://codeclimate.com/github/gilmaimon/CloudStorage-Server/maintainability) [![Build Status](https://travis-ci.org/gilmaimon/CloudStorage-Server.svg?branch=master)](https://travis-ci.org/gilmaimon/CloudStorage-Server)
 
 
-# CloudStorage Server v0.5
+# CloudStorage Server v0.5.1
 Simple backend for storing key/value pairs via http requests. Implemented with Node.js and MongoDB. Made for IOT projects.
 The server can store any type of json compatible data (primitives, objects, arrays);
 View the Arduino Client: [`Arduino-CloudStorage`](https://github.com/gilmaimon/Arduino-CloudStorage)
