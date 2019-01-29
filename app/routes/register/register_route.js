@@ -21,7 +21,7 @@ module.exports = {
         app.get('/user/register', function(req, res) {
             if(app.locals.config.show_register_ui) {
                 res.sendFile(
-                    path.join(__dirname + '/ui/register/register.html')
+                    path.join(__dirname + '/ui/register.html')
                 );
             } else {
                 res.status(404).send('Not found');
