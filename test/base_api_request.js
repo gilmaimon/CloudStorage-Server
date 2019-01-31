@@ -16,7 +16,7 @@ module.exports = function sendRequest(path, method, bodyJson, callback) {
 var closeHandler = null;
 
 before(function(done) {
-    server = require('../app/app').start(function(h) {
+    server = require('../app/http/server').start(function(h) {
         closeHandler = h;
         done();
     });

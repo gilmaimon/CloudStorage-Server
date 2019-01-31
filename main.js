@@ -1,2 +1,2 @@
-const app = require('./app/app');
-app.start();
+httpServer = require('./app/http/server');
+httpServer.start();
