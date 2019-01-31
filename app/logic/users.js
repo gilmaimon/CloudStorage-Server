@@ -100,19 +100,22 @@ module.exports = class Users {
 
     // returns: error message as a string or null in case of no error
     __validateRegisterParams(username, password) {
+        let errorMsg = null;
         if(username == null || password == null) {
-            return "missing parameters (username/password)";
+            errorMsg = "missing parameters (username/password)";
         } else if(typeof(username) != typeof(password) || typeof(username) != 'string') {
-            return "parameters (username/password) must be strings."
+            errorMsg = "parameters (username/password) must be strings."
         }
+
+        if(errorMsg) return errorMsg;
 
         username = username.trim();
         password = password.trim();
 
-        if(username.length < 4 || username.length > 16) return "Error: username longer than 16 or shorter than 4 characters";
-        if(password.length < 8 || password.length > 36) return "Error: password longer than 36 or shorter than 8 characters";
+        if(username.length < 4 || username.length > 16) errorMsg = "Error: username longer than 16 or shorter than 4 characters";
+        if(password.length < 8 || password.length > 36) errorMsg = "Error: password longer than 36 or shorter than 8 characters";
 
-        return null;
+        return errorMsg;
     }
 
     __registerUser(username, password, callback) {
