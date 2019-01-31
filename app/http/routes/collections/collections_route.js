@@ -4,28 +4,20 @@ module.exports = {
     use: function(app) {
         app.route('/data/collection')
         .post(function (req, res) {
-            req.userObj.add(req.body, function(err) {
-                respond(err, res);
-            });
+            req.userObj.add(req.body, respond(res));
         })
         .get(function(req, res) {
-            req.userObj.filter(req.body, function(err, result) {
-                respond(err, res, result);
-            });
+            req.userObj.filter(req.body, respond(res));
         });
 
         app.route('/data/collection/pop')
             .get(function(req, res) {
-                req.userObj.pop(req.body, function(err, result) {
-                    respond(err, res, result);
-                });
+                req.userObj.pop(req.body, respond(res));
             });
 
         app.route('/data/collection/aggregate')
             .get(function(req, res) {
-                req.userObj.aggregate(req.body, function(err, result) {
-                    respond(err, res, result);
-                })
+                req.userObj.aggregate(req.body, respond(res));
             });
     }
 }

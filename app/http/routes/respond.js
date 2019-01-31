@@ -1,4 +1,4 @@
-module.exports = function respond(err, res, result = {}) {
+function _respond(err, res, result = {}) {
     if(err) {
         res.status(400);
     } else {
@@ -6,4 +6,10 @@ module.exports = function respond(err, res, result = {}) {
     }
 
     res.send({"error": err, "result": result});
+}
+
+module.exports = function(res) {
+    return function(err, result) {
+        _respond(err, res, result);
+    }
 }
