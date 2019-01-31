@@ -13,17 +13,13 @@ module.exports = function sendRequest(path, method, bodyJson, callback) {
     }, callback);
 }
 
-var closeHandler = null;
-
 before(function(done) {
-    server = require('../app/http/server').start(function(h) {
-        closeHandler = h;
+    server = require('../app/http/server').startHttpServer(function(e) {
         done();
     });
 })
 
 after(function(done) {
-    closeHandler();
     process.exit();
     done();
 })

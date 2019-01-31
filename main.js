@@ -1,2 +1,2 @@
 httpServer = require('./app/http/server');
-httpServer.start();
+httpServer.startHttpServer();

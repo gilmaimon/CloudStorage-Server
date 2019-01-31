@@ -21,20 +21,21 @@ if(app.locals.config.allow_registering) {
     require('./routes/register/register_route').use(app);
 }
 
+
+
 module.exports = {
-    start: function(callback) {
+    startHttpServer: function(callback) {
         // Connect to database and run server
-        require('../database').initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
+        let db = require('../database');
+        db.initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
             if(!err) {
                 app.locals.users = new Users(db);
                 console.log("Server Listening on localhost:" + app.locals.config.port);
-                var server = app.listen(app.locals.config.port);
-                if(callback) callback(function() {
-                    server.close();
-                });
+                app.listen(app.locals.config.port);
+                if(callback) callback(false);
             } else {
                 console.log("Database init error");
-                if(callback) callback(null);
+                if(callback) callback(true);
             }
         });
     }
