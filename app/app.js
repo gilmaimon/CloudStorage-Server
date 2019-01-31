@@ -23,7 +23,7 @@ if(app.locals.config.allow_registering) {
 
 module.exports = {
     start: function(callback) {
-        // Connect to databae and run server
+        // Connect to database and run server
         var dbHelper = require('./database');
         dbHelper.initDatabaseConnection(app.locals.config.mongodb_url, function(err, db) {
             if(!err) {
