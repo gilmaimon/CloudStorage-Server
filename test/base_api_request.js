@@ -14,9 +14,10 @@ module.exports = function sendRequest(path, method, bodyJson, callback) {
 }
 
 before(function(done) {
-    server = require('../app/http/server').startHttpServer(function(e) {
-        done();
-    });
+    require('../app/main');
+
+    // Give server some time to start
+    setTimeout(() => done(), 1500);
 })
 
 after(function(done) {

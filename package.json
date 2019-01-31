@@ -25,8 +25,8 @@
     "mocha": "^5.2.0"
   },
   "scripts": {
-    "start": "node main.js",
-    "debug": "nodemon main.js",
+    "start": "node app/main.js",
+    "debug": "nodemon app/main.js",
     "test": "mocha"
   },
   "repository": {
