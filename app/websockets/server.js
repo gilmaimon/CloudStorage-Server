@@ -1,32 +1,29 @@
-var WebSocketServer = require('websocket').server;
 var http = require('http');
-var config = require('../config');
+var WebSocketServer = require('websocket').server;
+
+let Users = require('../logic/users');
+let Session = require('./session')
 
 var server = http.createServer(function(request, response) {});
-server.listen(config.web_sockets_port, function() { });
+wsServer = new WebSocketServer({httpServer: server});
 
-// create the server
-wsServer = new WebSocketServer({
-  httpServer: server
-});
+let sessions = []
+let sessionIdToSession = {}
+let sessionIdToKeys = {}
+let keysToSessionId = {}
 
-// WebSocket server
 wsServer.on('request', function(request) {
   var connection = request.accept(null, request.origin);
+  var session = new Session(users, connection);
+  sessions.push(session);
 
-  // This is the most important callback for us, we'll handle
-  // all messages from users here.
-  connection.on('message', function(message) {
-    if (message.type === 'utf8') {
-      // process WebSocket message
-    }
-  });
-
-  connection.on('close', function(connection) {
-    // close user connection
-  });
+  sessionIdToSession[session.sessionId] = session;
 });
 
+let users;
 module.exports = {
-  startWebsocketsServer: function(db, config) {}
+  startWebsocketsServer: function(db, config) {
+    users = new Users(db);
+    server.listen(config.web_sockets_port, function() {});
+  }
 }
