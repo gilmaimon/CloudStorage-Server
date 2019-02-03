@@ -28,26 +28,42 @@ class UnauthenticatedState {
 }
 
 class LoggedInState {
-    constructor(connection, user) {
+    constructor(parent, user, manager) {
         console.log("Logged in user " + user.username);
+        this.parentSession = parent;
         this.user = user;
-        this.connection = connection;
+        this.manager = manager;
     }
 
     handleMessage(message) {
-        console.log(message)
+        if(message.type == 'listen' && message.key != null) {
+            this.manager.addListener(this.parentSession, message.key);
+        } else if(message.type == 'notify-debug' && message.key != null) {
+            this.manager.notifyKeyChanged(this.user.username, message.key);
+        }
+    }
+
+    notifyKeyChanged(key) {
+        this.parentSession.connection.send(
+            JSON.stringify({
+                type: 'key-changed',
+                key: key
+            })
+        )
     }
 }
 
 module.exports = class Session {
-    constructor(users, connection) {
+    constructor(users, connection, manager) {
         console.log("Session created");
         this.sessionId = hash(connection);
+        this.connection = connection;
         this.state = new UnauthenticatedState(users, connection);
-        
+        this.manager = manager;
         let that = this;
         this.state.onLogin(function(user){
-            that.state = new LoggedInState(that.state.connection, user);
+            that.state = new LoggedInState(that, user, manager);
+            that.manager.onSessionAuthenticated(that, user);
         });
 
         this.active = true;
@@ -57,24 +73,32 @@ module.exports = class Session {
 
     onMessage(message) {
         if (message.type !== 'utf8') {
-            this.state.connection.send(
+            this.connection.send(
                 JSON.stringify({
                     error: true,
                     message: "Bad message. must be utf8"
                 })
             );
+            return;
         }
+        let msg;
         try {
-            let msg = JSON.parse(message.utf8Data);
-            this.state.handleMessage(msg);
+            msg = JSON.parse(message.utf8Data);
         } catch (err) {
-            this.state.connection.send(
+            this.connection.send(
                 JSON.stringify({
                     error: true,
                     message: "Bad message. Body must be a valid JSON"
                 })
             );
+            return;
         }
+
+        this.state.handleMessage(msg);
+    }
+
+    notifyKeyChanged(key) {
+        this.state.notifyKeyChanged(key);
     }
 
     onClosed() {
