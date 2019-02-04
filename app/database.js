@@ -1,26 +1,35 @@
-function initDb(db) {
-    // init users collection and indexes
-    db.createCollection('users', {
-        validator: { $and: [{
-            "username": { $type: "string", $exists: true },
-            "password": { $type: "string", $exists: true }
-        }]}}, function(err, collection) {
-        console.log("Database Ready");
+function initUsersDatabase(db) {
+    return new Promise(function(resolve, reject) {
+        // init users collection and indexes
+        db.createCollection('users', {
+            validator: { $and: [{
+                "username": { $type: "string", $exists: true },
+                "password": { $type: "string", $exists: true }
+            }]}
+        }, function(err) {
+            if(err) reject(err);
+            else resolve(null);
+        });
+        db.collection('users').createIndex( 
+            {'username': 1}, { unique: true } 
+        );
     });
-    db.collection('users').createIndex( {'username': 1}, { unique: true } );
 }
 
-const dbClient = require('mongodb').MongoClient;
+let mongodb = require('mongodb');
 
 module.exports = {
-    initDatabaseConnection: function initDatabaseConnection(fullUrl, callback) {
-        dbClient.connect(fullUrl, {useNewUrlParser:true}, function(err, db) {
-            if (err) callback(true, null);
-            else {
-                cloudstorageDB = db.db("cloudstorage");
-                initDb(cloudstorageDB);
-                callback(false, cloudstorageDB);
-            }
-        })
+    initDatabaseConnection: async function(fullUrl, callback) {
+        try {
+            let client = await mongodb.MongoClient.connect(
+                fullUrl, 
+                { useNewUrlParser:true }
+            );
+            let db = client.db("cloudstorage");
+            await initUsersDatabase(db);
+            callback(false, db);
+        } catch(err) {
+            callback(true, db);
+        }
     }
 }
