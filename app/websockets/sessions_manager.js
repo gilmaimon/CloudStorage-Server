@@ -11,14 +11,12 @@ module.exports = class SessionsManager {
         console.log(changedKey)
         console.log(newValue)
         let usersSessions = this.usernameToSessions[username];
-        for(let iSession = 0; iSession < usersSessions.length; iSession++) {
-            let session = usersSessions[iSession];
-            
+        usersSessions.forEach((session) => {
             let exactKeyIsListenedTo = this.sessionIdToListenedKeys[session.sessionId].has(changedKey);
             if(exactKeyIsListenedTo) {
                 session.notifyKeyChanged(changedKey, newValue);
             }
-        }
+        })
     }
 
     addListener(session, key) {
@@ -33,9 +31,9 @@ module.exports = class SessionsManager {
 
         this.sessionIdToListenedKeys[session.sessionId] = new Set([])
         if(this.usernameToSessions[user.username]) {
-            this.usernameToSessions[user.username].push(session);
+            this.usernameToSessions[user.username].add(session);
         } else {
-            this.usernameToSessions[user.username] = [session]
+            this.usernameToSessions[user.username] = new Set([session]);
         }
 
         this.sessionIdToUsernames[session.sessionId] = user.username;
@@ -45,6 +43,18 @@ module.exports = class SessionsManager {
     onNewSession(session) {
         console.log("on new session")
         this.unautenticatedSessions.add(session);
+        this.log();
+    }
+
+    onSessionClosed(session, username) {
+        console.log("Session closed");
+        if(session.isAuthenticated()) {
+            this.usernameToSessions[username].delete(session);
+            delete this.sessionIdToListenedKeys[session.sessionId]
+            delete this.sessionIdToUsernames[session.sessionId]
+        } else {
+            this.unautenticatedSessions.delete(session);
+        }
         this.log();
     }
 
