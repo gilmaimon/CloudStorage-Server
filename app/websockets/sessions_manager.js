@@ -7,10 +7,8 @@ module.exports = class SessionsManager {
     }
     
     notifyKeyChanged(username, changedKey, newValue) {
-        console.log("notify changed")
-        console.log(changedKey)
-        console.log(newValue)
         let usersSessions = this.usernameToSessions[username];
+        if(!usersSessions) return;
         usersSessions.forEach((session) => {
             let exactKeyIsListenedTo = this.sessionIdToListenedKeys[session.sessionId].has(changedKey);
             if(exactKeyIsListenedTo) {
