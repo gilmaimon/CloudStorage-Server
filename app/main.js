@@ -5,9 +5,12 @@ let config = require('./config');
 
 //database initiate instructions
 /*
-    mongod --dbpath DB_FILES_PATH --replSet "REPLICA_SET_NAME" --port PORT
-    mongo
-        REPLICA_SET_NAME.initiate()
+    // to start up replset node
+    mongod --dbpath data --replSet "rs" --port 3003
+
+    // first time with replset node
+    mongo --port 3003
+    rs.initiate()
 
 */
 db.initDatabaseConnection(config.mongodb_url, function(err, db) {
@@ -17,7 +20,12 @@ db.initDatabaseConnection(config.mongodb_url, function(err, db) {
     } else {
         console.log("Database init error");
     }
-}, function(username, update) {
-    console.log("Something was updated for user: " + username);
-    console.log(update);
+}, function(username, updates) {
+    Object.keys(updates).forEach(function(key) {
+        if(key.startsWith('data.')) {
+            let itemKey = key.substr('data.'.length);
+            let newValue = updates[key];
+            websockets.onUpdate(username, itemKey, newValue);
+        }
+    });
 });

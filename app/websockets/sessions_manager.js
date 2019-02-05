@@ -6,13 +6,17 @@ module.exports = class SessionsManager {
         this.sessionIdToUsernames = {}
     }
     
-    notifyKeyChanged(username, key) {
+    notifyKeyChanged(username, changedKey, newValue) {
         console.log("notify changed")
+        console.log(changedKey)
+        console.log(newValue)
         let usersSessions = this.usernameToSessions[username];
         for(let iSession = 0; iSession < usersSessions.length; iSession++) {
             let session = usersSessions[iSession];
-            if(this.sessionIdToListenedKeys[session.sessionId].has(key)) {
-                session.notifyKeyChanged(key);
+            
+            let exactKeyIsListenedTo = this.sessionIdToListenedKeys[session.sessionId].has(changedKey);
+            if(exactKeyIsListenedTo) {
+                session.notifyKeyChanged(changedKey, newValue);
             }
         }
     }

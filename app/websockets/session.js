@@ -38,16 +38,15 @@ class LoggedInState {
     handleMessage(message) {
         if(message.type == 'listen' && message.key != null) {
             this.manager.addListener(this.parentSession, message.key);
-        } else if(message.type == 'notify-debug' && message.key != null) {
-            this.manager.notifyKeyChanged(this.user.username, message.key);
         }
     }
 
-    notifyKeyChanged(key) {
+    notifyKeyChanged(changedKey, newValue) {
         this.parentSession.connection.send(
             JSON.stringify({
                 type: 'key-changed',
-                key: key
+                key: changedKey,
+                value: newValue
             })
         )
     }
@@ -97,8 +96,8 @@ module.exports = class Session {
         this.state.handleMessage(msg);
     }
 
-    notifyKeyChanged(key) {
-        this.state.notifyKeyChanged(key);
+    notifyKeyChanged(changedKey, newValue) {
+        this.state.notifyKeyChanged(changedKey, newValue);
     }
 
     onClosed() {

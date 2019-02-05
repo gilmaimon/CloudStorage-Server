@@ -34,5 +34,8 @@ module.exports = {
   startWebsocketsServer: function(db, config) {
     users = new Users(db);
     server.listen(config.web_sockets_port, function() {});
+  },
+  onUpdate: function(username, changedKey, newValue) {
+    manager.notifyKeyChanged(username, changedKey, newValue);
   }
 }
