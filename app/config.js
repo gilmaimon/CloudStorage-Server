@@ -2,7 +2,7 @@
 const config = {
     port :80,
     web_sockets_port: 1800,
-    mongodb_url: "mongodb://localhost:27017",
+    mongodb_url: "mongodb://localhost:3003",
     verbose : false,
     allow_registering : true,
     test_routes : true,

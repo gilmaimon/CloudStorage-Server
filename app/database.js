@@ -19,7 +19,7 @@ function initUsersDatabase(db) {
 let mongodb = require('mongodb');
 
 module.exports = {
-    initDatabaseConnection: async function(fullUrl, callback) {
+    initDatabaseConnection: async function(fullUrl, callback, updatesListener) {
         try {
             let client = await mongodb.MongoClient.connect(
                 fullUrl, 
@@ -27,9 +27,19 @@ module.exports = {
             );
             let db = client.db("cloudstorage");
             await initUsersDatabase(db);
+
+            db.collection('users').watch().on('change', async (change) => {
+                if(change.operationType === 'update') {
+                    let uid = change.documentKey._id
+                    let updatedUsers = await db.collection('users').find({_id: uid}, {username: true}).toArray();
+                    let changesMade = change.updateDescription.updatedFields;
+                    if(updatesListener) updatesListener(updatedUsers[0].username, changesMade);
+                }
+            });
+
             callback(false, db);
         } catch(err) {
-            callback(true, db);
+            callback(true, null);
         }
     }
 }
