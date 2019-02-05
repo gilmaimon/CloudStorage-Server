@@ -29,7 +29,7 @@ module.exports = {
             await initUsersDatabase(db);
             callback(false, db);
         } catch(err) {
-            callback(true, db);
+            callback(true, null);
         }
     }
 }
