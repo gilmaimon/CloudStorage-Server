@@ -40,7 +40,6 @@ module.exports = {
 
             callback(false, db, client);
         } catch(err) {
-            console.log(err);
             callback(true, null);
         }
     }
