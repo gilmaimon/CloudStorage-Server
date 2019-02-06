@@ -20,7 +20,7 @@ module.exports = class Session {
         this._connection.on('close', this.onClosed.bind(this));
     }
 
-    sendErroror(errMsg) {
+    sendError(errMsg) {
         this._connection.send(
             JSON.stringify({
                 error: true, 
@@ -46,10 +46,12 @@ module.exports = class Session {
         let msg;
         try {
             msg = JSON.parse(message.utf8Data);
-            this._state.handleMessage(msg);
         } catch (err) {
             this.sendError("Bad message. Body must be a valid JSON");
+            return;
         }
+
+        this._state.handleMessage(msg);
     }
 
     notifyKeyChanged(changedKey, newValue) {
