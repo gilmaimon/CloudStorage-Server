@@ -37,7 +37,7 @@ module.exports = {
                 }
             });
 
-            callback(false, db);
+            callback(false, db, client);
         } catch(err) {
             callback(true, null);
         }

@@ -26,6 +26,7 @@ module.exports = {
         var app = buildApp(config);
         app.locals.users = new Users(db);
         console.log("Server Listening on localhost:" + app.locals.config.port);
-        app.listen(app.locals.config.port);        
+        let server = app.listen(app.locals.config.port);
+        return () => server.close();       
     }
 };
