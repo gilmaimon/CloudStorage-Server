@@ -5,7 +5,8 @@ install:
   - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-4.1.1.tgz
   - tar xzf mongodb-linux-x86_64-4.1.1.tgz
   - ${PWD}/mongodb-linux-x86_64-4.1.1/bin/mongod --version
-  - ${PWD}/mongodb-linux-x86_64-4.1.1/bin/mongod --replSet "rs" --port 3003 --fork --syslog
+  - mkdir data
+  - ${PWD}/mongodb-linux-x86_64-4.1.1/bin/mongod --dbpath data/ --replSet "rs" --port 3003 --fork --syslog
   - echo "rs.initiate()" | mongo --port 3003
   - npm install
 script:
