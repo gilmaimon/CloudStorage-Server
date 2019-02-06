@@ -4,7 +4,6 @@ const LoggedInState = require('./logged_in_state')
 
 module.exports = class Session {
     constructor(users, connection, manager) {
-        console.log("Session created");
         this.sessionId = hash(connection);
         this._connection = connection;
         this._state = new UnauthenticatedState(this, manager, users);
@@ -55,12 +54,10 @@ module.exports = class Session {
     }
 
     notifyKeyChanged(changedKey, newValue) {
-        console.log("parent notify");
         this._state.notifyKeyChanged(changedKey, newValue);
     }
 
     onClosed() {
-        console.log("Session closed");
         this._state.onClosed();
         this.active = false;
     }

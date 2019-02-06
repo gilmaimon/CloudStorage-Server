@@ -1,6 +1,5 @@
 module.exports = class UnauthenticatedState {
     constructor(parent, manager, users) {
-        console.log("New unauth user");
         this.parent = parent;
         this.manager = manager;
         this.users = users;
