@@ -1,4 +1,7 @@
 language: node_js
+env:
+  global:
+    - HTTP_PORT=8080
 node_js:
   - "node"
 install:
