@@ -7,8 +7,9 @@ function initUsersDatabase(db) {
                 "password": { $type: "string", $exists: true }
             }]}
         }, function(err) {
-            if(err) reject(err);
-            else resolve(null);
+            resolve(null);
+            //if(err) reject(err);
+            //else resolve(null);
         });
         db.collection('users').createIndex( 
             {'username': 1}, { unique: true } 
@@ -39,6 +40,7 @@ module.exports = {
 
             callback(false, db, client);
         } catch(err) {
+            console.log(err);
             callback(true, null);
         }
     }
