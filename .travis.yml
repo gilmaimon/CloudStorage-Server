@@ -1,6 +1,16 @@
 language: node_js
+env:
+  global:
+    - HTTP_PORT=8080
 node_js:
   - "node"
+install:
+  - wget http://fastdl.mongodb.org/linux/mongodb-linux-x86_64-4.1.1.tgz
+  - tar xzf mongodb-linux-x86_64-4.1.1.tgz
+  - ${PWD}/mongodb-linux-x86_64-4.1.1/bin/mongod --version
+  - mkdir data
+  - ${PWD}/mongodb-linux-x86_64-4.1.1/bin/mongod --dbpath data/ --replSet "rs" --port 3003 --fork --syslog
+  - echo "rs.initiate()" | mongo --port 3003
+  - npm install
 script:
   - npm test
-services: mongodb
