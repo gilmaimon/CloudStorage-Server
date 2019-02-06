@@ -1,6 +1,9 @@
 language: node_js
 node_js:
   - "node"
-script:
+before_script:
+  - mongod --replSet "rs" --port 3003
+  - echo "rs.initiate()" | mongo --port 3003
+  script:
   - npm test
 services: mongodb
