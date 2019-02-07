@@ -22,7 +22,7 @@ class KeysTrie {
         let primary = keys[0];
         keys.shift(); // removes the first key
         
-        if(this.isEnd == true) return true;
+        if(this.children['*'] != null || this.isEnd == true) return true;
         
         if(this.children[primary] == null) {
             return false;
@@ -75,7 +75,7 @@ module.exports = class LoggedInState {
 
     notifyKeyChanged(changedKey, newValue) {
         if(this.keys.has(changedKey)) {
-            this.parent.sendSuccess('key-changed', {key: parseSubkeys(changedKey).join('.'), value: newValue});
+            this.parent.sendSuccess('value-changed', {key: parseSubkeys(changedKey).join('.'), value: newValue});
         }
     }
 
