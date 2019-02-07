@@ -23,12 +23,10 @@ module.exports = class SessionsManager {
         }
 
         this.sessionIdToUsernames[session.sessionId] = user.username;
-        this.log();
     }
 
     onNewSession(session) {
         this.unautenticatedSessions.add(session);
-        this.log();
     }
 
     onSessionClosed(session, username) {
@@ -38,6 +36,5 @@ module.exports = class SessionsManager {
         } else {
             this.unautenticatedSessions.delete(session);
         }
-        this.log();
     }
 }

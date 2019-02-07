@@ -14,6 +14,8 @@ module.exports = class UnauthenticatedState {
     handleMessage(message) {
         if (message.type === 'login') {
             this.authenticate(message.username, message.password);
+        } else {
+            this.parent.sendError("Bad command type");
         }
     }
     
