@@ -7,18 +7,6 @@ let Session = require('./session/session')
 var server = http.createServer(function(request, response) {});
 wsServer = new WebSocketServer({httpServer: server});
 
-let sessions = []
-
-/*
-Example login message:
-  {
-    "type": "login",
-    "username": "aaaaaaaaaaaaaa",
-                 bbbbbbbbbbbbbb
-    "password": "aaaaaaaaaaaaaa"
-  }
-*/
-
 let SessionsManager = require('./sessions_manager')
 let manager = new SessionsManager();
 
@@ -26,7 +14,6 @@ wsServer.on('request', function(request) {
   var connection = request.accept(null, request.origin);
   var session = new Session(users, connection, manager);
   manager.onNewSession(session);
-  // Set interval job to clear inactive sessions
 });
 
 let users;
