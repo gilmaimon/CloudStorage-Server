@@ -35,7 +35,7 @@ class KeysTrie {
 }
 
 function parseSubkeys(key) {
-    let subkeys = key.split('.');
+    let subkeys = key.trim().split('.');
     subkeys = subkeys.filter(key => isNaN(parseInt(key, 10)));
     return subkeys;
 }
@@ -56,6 +56,23 @@ class ListenedKeys {
     }
 }
 
+function includesAnyOf(str, chars) {
+    chars.forEach((ch) => {
+        if (str.includes(ch)) return true;
+    })
+
+    return false;
+}
+
+function isValidKey(key) {
+    if (key == null) return false;
+    key = key.trim();
+    if (key.length == 0) return false;
+        
+    var validKeyRegex = /^(\*|[a-z]+(\.[a-z0-9 ]+)*)$/g;
+    return str.match(validKeyRegex);
+}
+
 module.exports = class LoggedInState {
     constructor(parent, manager, user) {
         this.parent = parent;
@@ -65,9 +82,13 @@ module.exports = class LoggedInState {
     }
 
     handleMessage(message) {
-        if (message.type == 'listen' && message.key != null) {
-            this.keys.listenTo(message.key);
-            this.parent.sendSuccess("Successfully listening to key: " + message.key);
+        if (message.type == 'listen') {
+            if(isValidKey(message.key)) {
+                this.keys.listenTo(message.key);
+                this.parent.sendSuccess("Successfully listening to key: " + message.key);
+            } else {
+                this.parent.sendError("Key is missing or invalid");
+            }
         } else {
             this.parent.sendError("Bad command type");
         }
