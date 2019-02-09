@@ -70,7 +70,7 @@ function isValidKey(key) {
     if (key.length == 0) return false;
         
     var validKeyRegex = /^(\*|[a-z]+(\.[a-z0-9 ]+)*)$/g;
-    return str.match(validKeyRegex);
+    return key.match(validKeyRegex);
 }
 
 module.exports = class LoggedInState {
