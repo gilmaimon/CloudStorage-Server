@@ -5,7 +5,7 @@ var sendRequest = require('./base_api_request')
 var config = require('../app/config')
 var WebSocketClient = require('websocket').client;
 
-describe("Websockets Basic Operations", function() {
+describe("Websockets Basic Listening", function() {
     var randomValidUsername = randomstring.generate({ length: 12, charset: 'alphabetic' });
     var randomValidPassword = randomstring.generate({ length: 12, charset: 'alphabetic' });
 
