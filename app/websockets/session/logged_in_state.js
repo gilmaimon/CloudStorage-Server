@@ -85,18 +85,33 @@ module.exports = class LoggedInState {
         if (message.type == 'listen') {
             if(isValidKey(message.key)) {
                 this.keys.listenTo(message.key);
-                this.parent.sendSuccess("Successfully listening to key: " + message.key);
+                this.parent.sendSuccess({
+                    type: 'listen', 
+                    message: "Successfully listening to key: " + message.key
+                });
             } else {
-                this.parent.sendError("Key is missing or invalid");
+                this.parent.sendError({
+                    type: 'listen',
+                    message: 'Key is missing or invalid'
+                });
             }
         } else {
-            this.parent.sendError("Bad command type");
+            this.parent.sendError({
+                type: 'unknown-command',
+                message: 'Bad command type'
+            });
         }
     }
 
     notifyKeyChanged(changedKey, newValue) {
         if(this.keys.has(changedKey)) {
-            this.parent.sendSuccess('value-changed', {key: parseSubkeys(changedKey).join('.'), value: newValue});
+            this.parent.sendSuccess({
+                type: 'value-changed', 
+                result: {
+                    key: parseSubkeys(changedKey).join('.'), 
+                    value: newValue
+                }
+            });
         }
     }
 

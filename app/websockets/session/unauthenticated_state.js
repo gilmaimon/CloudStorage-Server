@@ -4,7 +4,9 @@ module.exports = class UnauthenticatedState {
         this.manager = manager;
         this.users = users;
 
-        this.parent.sendSuccess('ready', null);
+        this.parent.sendSuccess({
+            type: 'ready'
+        });
     }
     
     onLogin(callback) {
@@ -15,7 +17,11 @@ module.exports = class UnauthenticatedState {
         if (message.type === 'login') {
             this.authenticate(message.username, message.password);
         } else {
-            this.parent.sendError("Bad command type");
+            this.parent.sendError({
+                type: "unknown-command",
+                message: "Bad command type"
+            });
+            
         }
     }
     
@@ -23,10 +29,16 @@ module.exports = class UnauthenticatedState {
         let that = this;
         this.users.login(username, password, function (success, user) {
             if (success) {
-                that.parent.sendSuccess('login', "Successfully Logged in as " + username);
+                that.parent.sendSuccess({
+                    type: 'login', 
+                    message: "Successfully Logged in as " + username
+                });
                 that.callback(user);
             } else {
-                that.parent.sendError("Bad credentials. Could not log in.")
+                that.parent.sendError({
+                    type: 'login', 
+                    message: "Bad credentials. Could not log in."
+                });
             }
         })
     }

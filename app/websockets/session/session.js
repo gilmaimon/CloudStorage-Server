@@ -19,26 +19,31 @@ module.exports = class Session {
         this._connection.on('close', this.onClosed.bind(this));
     }
 
-    sendError(errMsg) {
+    sendError(params) {
         this._connection.send(
             JSON.stringify({
                 error: true, 
-                message: errMsg
+                message: params.message,
+                type: params.type
             })
         );
     }
 
-    sendSuccess(type, result) {
+    sendSuccess(params) {
         this._connection.send(JSON.stringify({
             error: false,
-            type: type,
-            result: result
+            type: params.type,
+            result: params.result,
+            message: params.message
         }));
     }
 
     onMessage(message) {
         if (message.type !== 'utf8') {
-            this.sendError("Bad message. must be utf8");
+            this.sendError({
+                type: 'bad-request',
+                message: 'Bad message. Type must be utf8'
+            });
             return;
         }
         
@@ -46,7 +51,10 @@ module.exports = class Session {
         try {
             msg = JSON.parse(message.utf8Data);
         } catch (err) {
-            this.sendError("Bad message. Body must be a valid JSON");
+            this.sendError({
+                type: 'bad-request',
+                message: 'Bad message. Body must be a valid JSON'
+            });
             return;
         }
 

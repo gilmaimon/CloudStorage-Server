@@ -53,7 +53,7 @@ describe("Websockets Basic Operations", function() {
                         // we expect the server to respond with ok message (we succesfully logged in)
                         expect(bodyJson.error).to.equal(false);
                         expect(bodyJson.type).to.equal('login');
-                        expect(bodyJson.result).to.equal(null);
+                        expect(bodyJson.result).to.equal(undefined);
                         expect(bodyJson.message).to.not.equal(null);
                         done();
                     }
