@@ -262,4 +262,114 @@ describe("Websockets Basic Listening", function() {
         })
     })
     
+    describe("Bad Listen Requests", function() {
+        it("Sends a listen command without a key", function(done) {
+            let state = 'READY';
+            var client = new WebSocketClient();
+            client.on('connectFailed', (error) => expect(error).to.deep.equal(null));
+            
+            client.on('connect', function(connection) {
+                connection.on('error', function(error) {});
+                connection.on('close', function() {});
+                connection.on('message', function(message) {
+                    expect(message.type).to.deep.equal('utf8');
+                    let bodyJson = JSON.parse(message.utf8Data);
+                    expect(bodyJson).to.not.equal(null);
+    
+                    expect(bodyJson.error).to.not.equal(null);
+                    expect(bodyJson.type).to.not.equal(null);
+    
+                    if(state == 'READY') {
+                        // this is the initial state. the server just sends a ready message
+                        expect(bodyJson.error).to.equal(false);
+                        expect(bodyJson.type).to.equal('ready');
+                        
+                        // send a login message with correct credentials
+                        connection.send(JSON.stringify({
+                            type: "login",
+                            username: randomValidUsername,
+                            password: randomValidPassword
+                        }));
+                        state = 'SENT_CORRECT_LOGIN';
+                    } else if(state == 'SENT_CORRECT_LOGIN') {
+                        // we expect the server to respond with ok message (we succesfully logged in)
+                        expect(bodyJson.error).to.equal(false);
+                        expect(bodyJson.type).to.equal('login');
+                        expect(bodyJson.message).to.not.equal(null);
+    
+                        // listen without a key
+                        connection.send(JSON.stringify({
+                            type: "listen"                        
+                        }));
+    
+                        state = 'BAD_LISTEN_SENT';
+    
+                    } else if(state == 'BAD_LISTEN_SENT') {
+                        expect(bodyJson.error).to.equal(true);
+                        expect(bodyJson.type).to.equal('listen');
+                        expect(bodyJson.message).to.not.equal(null);
+                        
+                        done();
+                    } 
+                });
+            });
+            
+            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+        })
+        it("Sends a login command after successfull login", function(done) {
+            let state = 'READY';
+            var client = new WebSocketClient();
+            client.on('connectFailed', (error) => expect(error).to.deep.equal(null));
+            
+            client.on('connect', function(connection) {
+                connection.on('error', function(error) {});
+                connection.on('close', function() {});
+                connection.on('message', function(message) {
+                    expect(message.type).to.deep.equal('utf8');
+                    let bodyJson = JSON.parse(message.utf8Data);
+                    expect(bodyJson).to.not.equal(null);
+    
+                    expect(bodyJson.error).to.not.equal(null);
+                    expect(bodyJson.type).to.not.equal(null);
+    
+                    if(state == 'READY') {
+                        // this is the initial state. the server just sends a ready message
+                        expect(bodyJson.error).to.equal(false);
+                        expect(bodyJson.type).to.equal('ready');
+                        
+                        // send a login message with correct credentials
+                        connection.send(JSON.stringify({
+                            type: "login",
+                            username: randomValidUsername,
+                            password: randomValidPassword
+                        }));
+                        state = 'SENT_CORRECT_LOGIN';
+                    } else if(state == 'SENT_CORRECT_LOGIN') {
+                        // we expect the server to respond with ok message (we succesfully logged in)
+                        expect(bodyJson.error).to.equal(false);
+                        expect(bodyJson.type).to.equal('login');
+                        expect(bodyJson.message).to.not.equal(null);
+    
+                        // send a login message with correct credentials
+                        connection.send(JSON.stringify({
+                            type: "login",
+                            username: randomValidUsername,
+                            password: randomValidPassword
+                        }));
+    
+                        state = 'LOGIN_SENT_AGAIN';
+    
+                    } else if(state == 'LOGIN_SENT_AGAIN') {
+                        expect(bodyJson.error).to.equal(true);
+                        expect(bodyJson.type).to.equal('unknown-command');
+                        expect(bodyJson.message).to.not.equal(null);
+                        
+                        done();
+                    } 
+                });
+            });
+            
+            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+        })
+    });
 })

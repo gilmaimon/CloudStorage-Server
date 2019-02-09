@@ -238,6 +238,5 @@ describe("Websockets Basic Operations", function() {
             
             client.connect(`ws://localhost:${config.web_sockets_port}/`);
         })
-
     });
 })
