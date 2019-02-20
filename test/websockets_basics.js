@@ -27,7 +27,7 @@ describe("Websockets Basic Operations", function() {
             client.on('connectFailed', (error) => expect(error).to.deep.equal(null));
             
             client.on('connect', function(connection) {
-                connection.on('error', function(error) {});
+                connection.on('error', function(error) {expect(error).to.equal(null)});
                 connection.on('close', function() {});
                 connection.on('message', function(message) {
                     expect(message.type).to.deep.equal('utf8');
@@ -60,7 +60,7 @@ describe("Websockets Basic Operations", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
         it("Tries to login with BAD credentials", function(done) {
             let state = 'READY';
@@ -100,7 +100,7 @@ describe("Websockets Basic Operations", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
     });
 
@@ -145,7 +145,7 @@ describe("Websockets Basic Operations", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
         it("Sends a non-json request", function(done) {
             let state = 'READY';
@@ -182,7 +182,7 @@ describe("Websockets Basic Operations", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })     
         it("Logins and send an unkown command", function(done) {
             let state = 'READY';
@@ -236,7 +236,7 @@ describe("Websockets Basic Operations", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
     });
 })

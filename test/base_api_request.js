@@ -14,17 +14,14 @@ module.exports = function sendRequest(path, method, bodyJson, callback) {
 }
 
 let http = require('../app/http/server');
-let websockets = require('../app/websockets/server');
 let db = require('../app/database');
 let cleanup;
 before(function(done) {
     db.initDatabaseConnection(config.mongodb_url, function(err, db, client) {
         if(!err) {
             let httpStopHandle = http.startHttpServer(db, config);
-            let wsStopHandle = websockets.startWebsocketsServer(db, config);
             cleanup = function() {
                 httpStopHandle();
-                wsStopHandle();
                 client.close();
             }
         } else {
@@ -35,7 +32,7 @@ before(function(done) {
             if(key.startsWith('data.')) {
                 let itemKey = key.substr('data.'.length);
                 let newValue = updates[key];
-                websockets.onUpdate(username, itemKey, newValue);
+                http.onUpdate(username, itemKey, newValue);
             }
         });
     });

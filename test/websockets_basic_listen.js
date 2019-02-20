@@ -88,7 +88,7 @@ describe("Websockets Basic Listening", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
         it("Listenes to to a parent and gets update for child", function(done) {
             let state = 'READY';
@@ -157,7 +157,7 @@ describe("Websockets Basic Listening", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
     })
 
@@ -258,7 +258,7 @@ describe("Websockets Basic Listening", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
     })
     
@@ -314,7 +314,7 @@ describe("Websockets Basic Listening", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
         it("Sends a login command after successfull login", function(done) {
             let state = 'READY';
@@ -369,7 +369,7 @@ describe("Websockets Basic Listening", function() {
                 });
             });
             
-            client.connect(`ws://localhost:${config.web_sockets_port}/`);
+            client.connect(`ws://localhost:${config.port}${config.listen_route}`);
         })
     });
 })

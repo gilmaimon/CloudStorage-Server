@@ -4,16 +4,15 @@ const LoggedInState = require('./logged_in_state')
 
 module.exports = class Session {
     constructor(users, connection, manager) {
-        this.sessionId = hash(connection);
+        this.sessionId = hash(Date.now());
         this._connection = connection;
         this._state = new UnauthenticatedState(this, manager, users);
-
+        
         let that = this;
         this._state.onLogin(function (user) {
             that._state = new LoggedInState(that, manager, user);
             manager.onSessionAuthenticated(that, user);
         });
-
         this.active = true;
         this._connection.on('message', this.onMessage.bind(this));
         this._connection.on('close', this.onClosed.bind(this));
@@ -38,18 +37,10 @@ module.exports = class Session {
         }));
     }
 
-    onMessage(message) {
-        if (message.type !== 'utf8') {
-            this.sendError({
-                type: 'bad-request',
-                message: 'Bad message. Type must be utf8'
-            });
-            return;
-        }
-        
+    onMessage(message) {    
         let msg;
         try {
-            msg = JSON.parse(message.utf8Data);
+            msg = JSON.parse(message);
         } catch (err) {
             this.sendError({
                 type: 'bad-request',

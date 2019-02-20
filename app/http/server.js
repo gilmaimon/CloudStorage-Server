@@ -1,9 +1,23 @@
 const express = require('express');
-const Users = require('../logic/users');
+const wsroutes = require('express-ws-routes');
 
-function buildApp(config) {
-    var app = express()
+const Users = require('../logic/users');
+let Session = require('./session/session')
+
+let SessionsManager = require('./session/sessions_manager')
+let manager = new SessionsManager();
+
+function buildApp(config, db) {
+    var app = wsroutes();
     app.locals.config = config;
+    app.locals.users = new Users(db);
+
+    app.websocket(config.listen_route, function(info, cb, next) {
+        cb(function(connection) {
+            var session = new Session(app.locals.users, connection, manager);
+            manager.onNewSession(session);
+        })
+    });
     
     // Middlewares
     require('./middlewares/logger/logger').attach(app);
@@ -23,10 +37,12 @@ function buildApp(config) {
 
 module.exports = {
     startHttpServer: function(db, config) {
-        var app = buildApp(config);
-        app.locals.users = new Users(db);
+        var app = buildApp(config, db);
         console.log("Server Listening on localhost:" + app.locals.config.port);
         let server = app.listen(app.locals.config.port);
         return () => server.close();       
+    },
+    onUpdate: function(username, changedKey, newValue) {
+      manager.notifyKeyChanged(username, changedKey, newValue);
     }
 };

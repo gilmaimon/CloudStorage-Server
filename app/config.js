@@ -1,7 +1,7 @@
 // Config
 const config = {
     port: process.env.HTTP_PORT | 80,
-    web_sockets_port: process.env.WS_PORT | 8080,
+    listen_route: "/listen",
     mongodb_url: "mongodb://localhost:3003",
     verbose : false,
     allow_registering : true,
