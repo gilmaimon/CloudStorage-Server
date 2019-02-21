@@ -69,7 +69,7 @@ function isValidKey(key) {
     key = key.trim();
     if (key.length == 0) return false;
         
-    var validKeyRegex = /^(\*|[a-z]+(\.[a-z0-9 ]+)*)$/g;
+    var validKeyRegex = /^(\*|[a-z_]+(\.[a-z0-9_ ]+)*)$/g;
     return key.match(validKeyRegex);
 }
 
