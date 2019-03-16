@@ -18,6 +18,10 @@ module.exports = class Session {
         this._connection.on('close', this.onClosed.bind(this));
     }
 
+    isActive() {
+        return this._connection.readyState === this._connection.OPEN;
+    }
+
     ping() {
         this._connection.ping();
     }

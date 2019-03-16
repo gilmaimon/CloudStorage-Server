@@ -1,3 +1,5 @@
+const PING_CLIENT_INTERVAL_IN_MS = 1000 * 5;
+
 module.exports = class SessionsManager {
     constructor() {
         this.unautenticatedSessions = new Set([])
@@ -27,9 +29,14 @@ module.exports = class SessionsManager {
 
     onNewSession(session) {
         this.unautenticatedSessions.add(session);
-        setInterval(function(){
-            session.ping();
-        }, 3 * 60 * 1000);
+
+        let intervalId = setInterval(function(){
+            if(session.isActive()) {
+                session.ping();
+            } else {
+                clearInterval(intervalId);   
+            }
+        }, PING_CLIENT_INTERVAL_IN_MS);
     }
 
     onSessionClosed(session, username) {
