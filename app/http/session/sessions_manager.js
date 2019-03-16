@@ -27,6 +27,9 @@ module.exports = class SessionsManager {
 
     onNewSession(session) {
         this.unautenticatedSessions.add(session);
+        setInterval(function(){
+            session.ping();
+        }, 3 * 60 * 1000);
     }
 
     onSessionClosed(session, username) {

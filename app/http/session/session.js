@@ -18,6 +18,10 @@ module.exports = class Session {
         this._connection.on('close', this.onClosed.bind(this));
     }
 
+    ping() {
+        this._connection.ping();
+    }
+
     sendError(params) {
         this._connection.send(
             JSON.stringify({
