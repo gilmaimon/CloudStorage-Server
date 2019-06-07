@@ -21,7 +21,8 @@
     "randomstring": "^1.1.5",
     "request": "^2.88.0",
     "websocket": "^1.0.28",
-    "websockets": "^0.2.0"
+    "websockets": "^0.2.0",
+    "ws": "^3.3.1"
   },
   "devDependencies": {
     "mocha": "^5.2.0"
