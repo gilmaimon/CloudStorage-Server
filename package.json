@@ -8,10 +8,10 @@
   },
   "dependencies": {
     "bcrypt": "^3.0.6",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.3",
     "chai": "^4.2.0",
     "errorhandler": "^1.5.1",
-    "express": "^4.17.1",
+    "express": "^4.21.0",
     "express-rate-limit": "^4.0.4",
     "express-slow-down": "^1.3.1",
     "express-ws-routes": "^1.1.0",
