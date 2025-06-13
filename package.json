@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "bcrypt": "^3.0.6",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "chai": "^4.2.0",
     "errorhandler": "^1.5.1",
